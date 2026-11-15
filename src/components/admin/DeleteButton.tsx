@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * Small form that calls a delete Server Action after a browser confirm().
+ * Calls a delete Server Action after a browser confirm().
  * The action receives FormData with the hidden `id`.
  */
 import { useTransition } from "react";
-import { btnDanger } from "@/components/ui/styles";
+import { Button } from "@/components/ui/Button";
 
 export function DeleteButton({
   id,
@@ -21,9 +21,8 @@ export function DeleteButton({
   const [pending, startTransition] = useTransition();
 
   return (
-    <button
-      type="button"
-      className={btnDanger}
+    <Button
+      variant="danger"
       disabled={pending}
       onClick={() => {
         if (!confirm(confirmText)) return;
@@ -33,6 +32,6 @@ export function DeleteButton({
       }}
     >
       {pending ? "Deleting…" : label}
-    </button>
+    </Button>
   );
 }

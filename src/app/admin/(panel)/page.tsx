@@ -32,13 +32,13 @@ export default async function DashboardPage() {
       <h1 className="mb-6 text-2xl font-semibold">Dashboard</h1>
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {cards.map((c) => (
-          <Link key={c.label} href={c.href} className={`${cardCls} hover:border-blue-300`}>
-            <p className="text-sm text-gray-500">{c.label}</p>
+          <Link key={c.label} href={c.href} className={`${cardCls} hover:border-brand-300`}>
+            <p className="text-sm text-slate-500">{c.label}</p>
             <p className="mt-1 text-3xl font-semibold">{c.value}</p>
           </Link>
         ))}
       </div>
-      <p className="mt-6 text-sm text-gray-500">Order and profit stats arrive in stage 5.</p>
+      <p className="mt-6 text-sm text-slate-500">Order and profit stats arrive in stage 5.</p>
     </>
   );
 }

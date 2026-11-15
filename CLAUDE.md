@@ -84,6 +84,41 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
 - Mobile-first UI. WhatsApp number in `settings.whatsapp_number` (format `234…`, links via `wa.me`).
 - Prefer Server Components; add `"use client"` only for interactivity (cart, forms with state).
 
+## Brand & Design
+Copy: tagline **"Enjoy your work"**. Selling points: **vetted & trusted vendors**,
+**fast delivery** across Lagos. (Brand name "Gadget Store" is temporary.)
+
+Tokens live in `src/app/globals.css` (`@theme`). **Never hard-code hex values or
+use raw Tailwind palettes (blue/green/red/amber/gray) in components** — use:
+- `brand-50…950` (600 = primary brand colour), `accent` (amber),
+  `success` / `warning` / `danger` (+ `-50` tint, `-700` text), and `slate-*` neutrals.
+
+Colour roles:
+- Page bg white; subtle sections/cards `slate-50`; borders `slate-200`
+- Headings `slate-900`, body `slate-700`, muted/labels `slate-500`
+- Links `text-brand-600 hover:text-brand-700` (`linkCls`); focus rings `ring-brand-500` — always keep visible focus
+- Selected chips / light highlights `bg-brand-100 text-brand-800`
+- Prices `slate-900` bold (or `brand-700`) — never amber
+- Hero banner + footer: `bg-brand-900 text-white`
+- **Amber `accent` ONLY for "Hot deal" / "Featured" / discount badges** (dark text on it)
+- White dominates; blue is for buttons, links, prices, key highlights — not big blocks
+
+Status colours (only for status, same everywhere — mappings in `components/ui/Badge.tsx`):
+- success: in stock, delivered, completed, paid
+- warning: pending, new order awaiting action
+- danger: out of stock, cancelled, returned, payment failed, form errors
+- brand: in-progress (vendor_confirmed, rider_assigned, picked_up)
+- Badges = light bg + dark text of the same colour (`bg-success-50 text-success-700`)
+
+Shared components — use these, don't restyle ad hoc:
+- `components/ui/Button.tsx`: `<Button variant="primary|secondary|danger|ghost" size="sm|md|lg">`,
+  `<ButtonLink href>`, `buttonClasses()` for other elements. One primary style app-wide.
+- `components/ui/Badge.tsx`: `<Badge tone>`, `<OrderStatusBadge>`, `<StockBadge>`, `*_TONE` maps
+- `components/ui/Alert.tsx`: `<Alert tone="success|warning|danger|info">`
+- `components/ui/Field.tsx`: `<Field>`, `<Checkbox>`; `components/ui/styles.ts`: `inputCls`,
+  `cardCls`, `linkCls`, table classes
+- Text contrast must meet WCAG AA (why status text uses the `-700` shades).
+
 ## Commands
 - `npm run dev` / `npm run build` / `npm run lint`
 - `npm run db:push` — apply migrations to the linked hosted project (CLI v3 needs `--remote`; without it, it targets a local Docker DB)

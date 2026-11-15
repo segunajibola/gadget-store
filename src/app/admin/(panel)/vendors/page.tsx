@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { adminDb } from "@/lib/auth";
 import { formatNgPhone } from "@/lib/phone";
-import { Badge, EmptyState, PageHeader } from "@/components/admin/PageHeader";
+import { EmptyState, PageHeader } from "@/components/admin/PageHeader";
+import { Badge } from "@/components/ui/Badge";
+import { linkCls, tableCls, tableWrapCls, tbodyCls, theadCls } from "@/components/ui/styles";
 
 export const metadata: Metadata = { title: "Vendors" };
 
@@ -22,9 +24,9 @@ export default async function VendorsPage() {
       {vendors.length === 0 ? (
         <EmptyState>No vendors yet.</EmptyState>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 text-gray-600">
+        <div className={tableWrapCls}>
+          <table className={tableCls}>
+            <thead className={theadCls}>
               <tr>
                 <th className="px-4 py-2">Name</th>
                 <th className="px-4 py-2">Phone</th>
@@ -33,19 +35,19 @@ export default async function VendorsPage() {
                 <th className="px-4 py-2">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className={tbodyCls}>
               {vendors.map((v) => (
-                <tr key={v.id} className="hover:bg-gray-50">
+                <tr key={v.id} className="hover:bg-slate-50">
                   <td className="px-4 py-2 font-medium">
-                    <Link href={`/admin/vendors/${v.id}`} className="text-blue-700 hover:underline">
+                    <Link href={`/admin/vendors/${v.id}`} className={linkCls}>
                       {v.name}
                     </Link>
                   </td>
                   <td className="px-4 py-2">{v.phone ? formatNgPhone(v.phone) : "—"}</td>
-                  <td className="px-4 py-2 text-gray-600">{v.address ?? "—"}</td>
+                  <td className="px-4 py-2 text-slate-600">{v.address ?? "—"}</td>
                   <td className="px-4 py-2">{v.products[0]?.count ?? 0}</td>
                   <td className="px-4 py-2">
-                    <Badge on={v.is_active}>{v.is_active ? "Active" : "Inactive"}</Badge>
+                    <Badge tone={v.is_active ? "success" : "neutral"}>{v.is_active ? "Active" : "Inactive"}</Badge>
                   </td>
                 </tr>
               ))}

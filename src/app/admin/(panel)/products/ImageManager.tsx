@@ -10,7 +10,10 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/browser";
 import { PRODUCT_IMAGES_BUCKET } from "@/lib/constants";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_BYTES } from "@/lib/images";
-import { btnSecondary } from "@/components/ui/styles";
+import { Alert } from "@/components/ui/Alert";
+import { Badge } from "@/components/ui/Badge";
+import { buttonClasses } from "@/components/ui/Button";
+import { linkCls } from "@/components/ui/styles";
 import {
   addProductImage,
   createImageUploadUrl,
@@ -61,16 +64,16 @@ export function ImageManager({ productId, images }: { productId: string; images:
 
   return (
     <div className="space-y-3">
-      {images.length === 0 && <p className="text-sm text-gray-500">No images yet.</p>}
+      {images.length === 0 && <p className="text-sm text-slate-500">No images yet.</p>}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {images.map((img, i) => (
-          <div key={img.id} className="overflow-hidden rounded-md border border-gray-200 bg-white">
-            <div className="relative aspect-square bg-gray-50">
+          <div key={img.id} className="overflow-hidden rounded-md border border-slate-200 bg-white">
+            <div className="relative aspect-square bg-slate-50">
               <Image src={img.url} alt="" fill sizes="200px" className="object-contain" />
               {i === 0 && (
-                <span className="absolute left-1 top-1 rounded bg-blue-600 px-1.5 py-0.5 text-xs text-white">
-                  Main
+                <span className="absolute left-1 top-1">
+                  <Badge tone="brand">Main</Badge>
                 </span>
               )}
             </div>
@@ -79,7 +82,7 @@ export function ImageManager({ productId, images }: { productId: string; images:
                 <button
                   type="button"
                   disabled={busy}
-                  className="text-blue-700 hover:underline"
+                  className={linkCls}
                   onClick={() => startTransition(() => setMainImage(img.id))}
                 >
                   Make main
@@ -90,7 +93,7 @@ export function ImageManager({ productId, images }: { productId: string; images:
               <button
                 type="button"
                 disabled={busy}
-                className="text-red-600 hover:underline"
+                className="text-danger-700 hover:underline"
                 onClick={() => {
                   if (confirm("Delete this image?"))
                     startTransition(() => deleteProductImage(img.id));
@@ -103,7 +106,14 @@ export function ImageManager({ productId, images }: { productId: string; images:
         ))}
       </div>
 
-      <label className={`${btnSecondary} cursor-pointer ${busy ? "pointer-events-none opacity-60" : ""}`}>
+      {/* The real file input is visually hidden; focus-within keeps a visible focus ring */}
+      <label
+        className={buttonClasses(
+          "secondary",
+          "md",
+          `cursor-pointer focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 ${busy ? "pointer-events-none opacity-60" : ""}`,
+        )}
+      >
         {uploading ? "Uploading…" : "+ Upload images"}
         <input
           ref={inputRef}
@@ -114,8 +124,8 @@ export function ImageManager({ productId, images }: { productId: string; images:
           onChange={(e) => e.target.files?.length && upload(e.target.files)}
         />
       </label>
-      <p className="text-xs text-gray-500">JPG, PNG, WebP or AVIF, up to 5 MB each. First image is the main one.</p>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <p className="text-xs text-slate-500">JPG, PNG, WebP or AVIF, up to 5 MB each. First image is the main one.</p>
+      {error && <Alert tone="danger">{error}</Alert>}
     </div>
   );
 }

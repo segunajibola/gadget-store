@@ -3,6 +3,7 @@ import { adminDb } from "@/lib/auth";
 import { CATEGORIES, CONDITIONS, STOCK_STATUSES } from "@/lib/constants";
 import { productImageUrl } from "@/lib/images";
 import { koboToNaira } from "@/lib/money";
+import { Alert } from "@/components/ui/Alert";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -57,9 +58,9 @@ export default async function ProductPage({
       </PageHeader>
 
       {created && (
-        <p className="mb-4 rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">
-          Product created. Now add some images below.
-        </p>
+        <div className="mb-4">
+          <Alert tone="success">Product created. Now add some images below.</Alert>
+        </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_380px]">
@@ -109,8 +110,10 @@ export default async function ProductPage({
             </Field>
 
             {/* Private section: never shown on the storefront */}
-            <fieldset className="space-y-4 rounded-md border border-amber-200 bg-amber-50 p-4">
-              <legend className="px-1 text-sm font-medium text-amber-800">Pricing &amp; sourcing</legend>
+            <fieldset className="space-y-4 rounded-md border border-slate-200 bg-slate-50 p-4">
+              <legend className="px-1 text-sm font-medium text-slate-900">
+                🔒 Pricing &amp; sourcing <span className="font-normal text-slate-500">(private — admin only)</span>
+              </legend>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Selling price (₦)" hint="What customers pay">
                   <input
@@ -162,7 +165,7 @@ export default async function ProductPage({
               }))}
             />
           ) : (
-            <p className="text-sm text-gray-500">Save the product first, then add images.</p>
+            <p className="text-sm text-slate-500">Save the product first, then add images.</p>
           )}
         </div>
       </div>

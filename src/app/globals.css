@@ -1,12 +1,60 @@
 @import "tailwindcss";
 
-/* Light theme only for now. Brand colours can be added here later. */
+/*
+ * Brand design tokens (Tailwind v4). Every --color-* here becomes a utility:
+ * bg-brand-600, text-brand-700, border-brand-200, ring-brand-500, bg-success-50 …
+ * Components must use these tokens, never raw hex values. See CLAUDE.md
+ * "Brand & Design" for which colour to use where.
+ */
+@theme {
+  /* Primary brand blue — 600 is THE brand colour */
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #d9e6ff;
+  --color-brand-200: #bcd3ff;
+  --color-brand-300: #8eb6ff;
+  --color-brand-400: #598dff;
+  --color-brand-500: #3366ff;
+  --color-brand-600: #1a4fe6;
+  --color-brand-700: #153fc0;
+  --color-brand-800: #17369b;
+  --color-brand-900: #18317a;
+  --color-brand-950: #111f4a;
+
+  /* Accent amber — ONLY for "Hot deal" / "Featured" / discount badges */
+  --color-accent: #f59e0b;
+
+  /*
+   * Status colours. The base value is for icons/solid fills; the -50 tint is
+   * a badge/alert background and -700 is the text on it (AA contrast — the
+   * base success/warning shades are too light for small text on white).
+   */
+  --color-success: #16a34a;
+  --color-success-50: #f0fdf4;
+  --color-success-700: #15803d;
+
+  --color-warning: #d97706;
+  --color-warning-50: #fffbeb;
+  --color-warning-700: #b45309;
+
+  --color-danger: #dc2626;
+  --color-danger-50: #fef2f2;
+  --color-danger-700: #b91c1c;
+}
+
+/* Fonts from next/font (set as CSS variables in app/layout.tsx) */
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+/* Neutrals come from Tailwind's built-in slate scale. White dominates. */
 body {
-  background: #ffffff;
-  color: #171717;
+  @apply bg-white text-slate-700;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  @apply text-slate-900;
 }

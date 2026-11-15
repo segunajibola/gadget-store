@@ -13,7 +13,8 @@
  */
 import { startTransition, useActionState, type ReactNode } from "react";
 import type { FormAction } from "@/lib/forms";
-import { btnPrimary } from "@/components/ui/styles";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
 
 export function ActionForm({
   action,
@@ -39,18 +40,12 @@ export function ActionForm({
     >
       {children}
 
-      {state?.error && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-          {state.error}
-        </p>
-      )}
-      {state?.message && (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{state.message}</p>
-      )}
+      {state?.error && <Alert tone="danger">{state.error}</Alert>}
+      {state?.message && <Alert tone="success">{state.message}</Alert>}
 
-      <button type="submit" className={btnPrimary} disabled={pending}>
+      <Button type="submit" disabled={pending}>
         {pending ? "Saving…" : submitLabel}
-      </button>
+      </Button>
     </form>
   );
 }

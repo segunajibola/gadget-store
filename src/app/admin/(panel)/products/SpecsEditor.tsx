@@ -6,7 +6,8 @@
  * so the surrounding form submits them like any other field.
  */
 import { useState } from "react";
-import { btnSecondary, inputCls } from "@/components/ui/styles";
+import { Button } from "@/components/ui/Button";
+import { inputCls } from "@/components/ui/styles";
 
 type Spec = { label: string; value: string };
 
@@ -22,7 +23,7 @@ export function SpecsEditor({ initial }: { initial: Spec[] }) {
 
   return (
     <div className="space-y-2">
-      <span className="text-sm font-medium text-gray-700">Specs</span>
+      <span className="text-sm font-medium text-slate-700">Specs</span>
       <input type="hidden" name="specs" value={JSON.stringify(filled)} />
       <datalist id="spec-labels">
         {SUGGESTIONS.map((s) => (
@@ -49,20 +50,20 @@ export function SpecsEditor({ initial }: { initial: Spec[] }) {
             type="button"
             aria-label="Remove spec"
             onClick={() => setRows((r) => r.filter((_, j) => j !== i))}
-            className="px-2 text-gray-400 hover:text-red-600"
+            className="px-2 text-slate-400 hover:text-danger"
           >
             ✕
           </button>
         </div>
       ))}
 
-      <button
-        type="button"
-        className={btnSecondary}
+      <Button
+        variant="secondary"
+        size="sm"
         onClick={() => setRows((r) => [...r, { label: "", value: "" }])}
       >
         + Add spec
-      </button>
+      </Button>
     </div>
   );
 }

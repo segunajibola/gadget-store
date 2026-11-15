@@ -18,8 +18,8 @@ export default async function LoginPage({
   const { next = "" } = await searchParams;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+    <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
         <h1 className="mb-6 text-xl font-semibold">Admin login</h1>
         <ActionForm action={login} submitLabel="Log in">
           <input type="hidden" name="next" value={next} />

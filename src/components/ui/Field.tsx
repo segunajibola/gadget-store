@@ -14,9 +14,9 @@ export function Field({
 }) {
   return (
     <label className={`block space-y-1 ${className}`}>
-      <span className="text-sm font-medium text-gray-700">{label}</span>
+      <span className="text-sm font-medium text-slate-700">{label}</span>
       {children}
-      {hint && <span className="block text-xs text-gray-500">{hint}</span>}
+      {hint && <span className="block text-xs text-slate-500">{hint}</span>}
     </label>
   );
 }
@@ -31,12 +31,12 @@ export function Checkbox({
   defaultChecked?: boolean;
 }) {
   return (
-    <label className="flex items-center gap-2 text-sm text-gray-700">
+    <label className="flex items-center gap-2 text-sm text-slate-700">
       <input
         type="checkbox"
         name={name}
         defaultChecked={defaultChecked}
-        className="h-4 w-4 rounded border-gray-300"
+        className="h-4 w-4 rounded border-slate-300 accent-brand-600 focus-visible:ring-2 focus-visible:ring-brand-500"
       />
       {label}
     </label>
