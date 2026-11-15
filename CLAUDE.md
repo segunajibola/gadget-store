@@ -30,7 +30,16 @@ src/app/                 routes (storefront, /admin, /api/paystack/*)
   admin/(panel)/         all protected admin pages (route group = shared layout, not in URL)
     <entity>/page.tsx      list;  <entity>/[id]/page.tsx  edit ("new" = create)
     <entity>/actions.ts    Server Actions for that entity
+  (store)/               storefront route group: layout (header/footer/WhatsApp), home,
+                         products (list), products/[slug], cart, checkout
+  robots.ts, sitemap.ts  SEO files
 src/proxy.ts             refreshes Supabase session on /admin/*, redirects logged-out users
+src/lib/supabase/public.ts  cookie-less anon client for cacheable storefront reads
+src/lib/store.ts         storefront queries (getSettings, searchProducts, getProductBySlug…)
+src/lib/products.ts      public Product type + toProduct() mapper for public_products rows
+src/lib/cart.ts          localStorage cart (useSyncExternalStore): useCart, cartActions
+src/lib/brand.ts         marketing copy (tagline, hero text)
+src/components/store/    Header, Footer, ProductCard/Grid, ProductGallery, AddToCart, CartView, WhatsApp
 src/lib/auth.ts          getAdminUser / requireAdmin / adminDb  ← admin data access layer
 src/lib/forms.ts         FormState type, zod field helpers (nairaAmount, ngPhone…), dbErrorMessage
 src/lib/phone.ts         Nigerian phone normalise (234…), display (0…), wa.me links
@@ -81,6 +90,11 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
   can override `delivery_fee` / `rider_cost` per order after negotiating offline.
 - Schema changes: new migration via `npx supabase migration new <name>`, never edit
   pushed migrations; update `constants.ts` if enums change; rerun `npm run db:types`.
+- Storefront reads use `createPublicClient()` (no cookies) via `lib/store.ts`, so pages
+  can be cached: home + product pages use `export const revalidate = 300` (ISR);
+  `/products` is dynamic (searchParams). Admin mutations `revalidatePath("/", "layout")`.
+- Cart prices are display-only; `CartView` re-fetches live price/stock from
+  `public_products`. Checkout must recompute everything server-side.
 - Mobile-first UI. WhatsApp number in `settings.whatsapp_number` (format `234…`, links via `wa.me`).
 - Prefer Server Components; add `"use client"` only for interactivity (cart, forms with state).
 
@@ -101,6 +115,8 @@ Colour roles:
 - Prices `slate-900` bold (or `brand-700`) — never amber
 - Hero banner + footer: `bg-brand-900 text-white`
 - **Amber `accent` ONLY for "Hot deal" / "Featured" / discount badges** (dark text on it)
+- WhatsApp buttons only: `bg-whatsapp` for the icon-only float, `bg-whatsapp-700
+  hover:bg-whatsapp-800` for buttons with text (AA contrast)
 - White dominates; blue is for buttons, links, prices, key highlights — not big blocks
 
 Status colours (only for status, same everywhere — mappings in `components/ui/Badge.tsx`):
@@ -128,7 +144,7 @@ Shared components — use these, don't restyle ad hoc:
 Work stage by stage and stop for review after each:
 1. ✅ Setup, schema, RLS, README
 2. ✅ Admin auth + CRUD (products + images, vendors, riders, zones, settings)
-3. Storefront: home, listing/search, product page, cart (localStorage)
+3. ✅ Storefront: home (landing), listing/search, product page, cart (localStorage), SEO
 4. Checkout, order creation, Paystack + webhook, pay on delivery
 5. Admin orders: status flow, assignment, WhatsApp buttons, profit, dashboard
 6. Order tracking, polish, deploy

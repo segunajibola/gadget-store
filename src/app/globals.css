@@ -39,6 +39,14 @@
   --color-danger: #dc2626;
   --color-danger-50: #fef2f2;
   --color-danger-700: #b91c1c;
+
+  /* WhatsApp buttons only.
+     - whatsapp: icon-only float button (3:1 vs white, WCAG non-text contrast)
+     - whatsapp-700: background for buttons WITH TEXT (white text ≈ 5:1, AA)
+     - whatsapp-800: hover for text buttons */
+  --color-whatsapp: #1da851;
+  --color-whatsapp-700: #15803d;
+  --color-whatsapp-800: #166534;
 }
 
 /* Fonts from next/font (set as CSS variables in app/layout.tsx) */
@@ -47,14 +55,67 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Neutrals come from Tailwind's built-in slate scale. White dominates. */
-body {
-  @apply bg-white text-slate-700;
+/*
+ * Base styles MUST live in @layer base. Unlayered CSS beats Tailwind
+ * utilities, so `h1 { color }` outside a layer would override classes like
+ * text-white on a heading.
+ * Neutrals come from Tailwind's built-in slate scale. White dominates.
+ */
+@layer base {
+  :root {
+    /* Lets CSS transition to/from `auto` sizes (used by the FAQ accordion). */
+    interpolate-size: allow-keywords;
+  }
+
+  body {
+    @apply bg-white text-slate-700;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-slate-900;
+  }
 }
 
-h1,
-h2,
-h3,
-h4 {
-  @apply text-slate-900;
+/*
+ * FAQ accordion (<details class="faq">) — smooth open/close.
+ * Height animation works in modern Chromium browsers; everywhere else the
+ * answer still fades/slides in. Motion is disabled for users who ask for it.
+ */
+@layer components {
+  .faq::details-content {
+    block-size: 0;
+    overflow: hidden;
+    transition:
+      block-size 250ms ease,
+      content-visibility 250ms allow-discrete;
+  }
+  .faq[open]::details-content {
+    block-size: auto;
+  }
+  .faq[open] .faq-answer {
+    animation: faq-in 250ms ease-out;
+  }
+
+  @keyframes faq-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq::details-content {
+      transition: none;
+    }
+    .faq[open] .faq-answer {
+      animation: none;
+    }
+  }
 }
