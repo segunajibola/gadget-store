@@ -20,6 +20,9 @@ const settingsSchema = z.object({
   support_email: optionalText.pipe(z.email("Support email is invalid").nullable()),
   hub_address: requiredText("Hub address"),
   pod_max_order_value: nairaAmount("Pay-on-delivery limit"),
+  calendly_url: optionalText.pipe(
+    z.url({ protocol: /^https$/, error: "Booking link must be a full https:// link" }).nullable(),
+  ),
 });
 
 export async function saveSettings(_prev: FormState, formData: FormData): Promise<FormState> {

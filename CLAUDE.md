@@ -45,6 +45,16 @@ src/lib/orders.ts        startPaystackPayment(), confirmPaystackPayment() (idemp
 src/app/(store)/checkout/actions.ts   placeOrder / retryPayment Server Actions (public, untrusted input)
 src/app/(store)/order/[id]/           customer order page (UUID link; customer-safe columns only)
 src/app/api/paystack/callback|webhook route handlers
+src/app/admin/(panel)/orders/          list (tabs/search), [id] detail (StatusPanel, FulfilmentEditor), actions.ts
+src/lib/order-flow.ts    allowed status transitions, REVENUE_STATUSES — UI + server both use it
+src/lib/whatsapp-messages.ts  vendor / rider / customer message templates (admin only)
+src/lib/dates.ts         Lagos-time period starts + formatting (servers run in UTC)
+src/lib/laptop-finder.ts form options (use cases, budgets, brands) + LaptopAdvice type — shared
+src/lib/laptop-advisor.ts  Claude call (claude-opus-5-5, structured output via zod, effort low,
+                         server-side refusal fallback) — server only; returns null if no key / error
+src/app/(store)/laptop-finder/  public form + results; actions.ts saves to laptop_requests
+src/app/admin/(panel)/leads/    laptop finder leads: list, detail, follow-up status/notes
+src/components/admin/ActionButton.tsx  button for a pre-bound Server Action (`action.bind(null, id)`)
 src/components/store/    Header, Footer, ProductCard/Grid, ProductGallery, AddToCart, CartView, WhatsApp
 src/lib/auth.ts          getAdminUser / requireAdmin / adminDb  ← admin data access layer
 src/lib/forms.ts         FormState type, zod field helpers (nairaAmount, ngPhone…), dbErrorMessage
@@ -95,11 +105,20 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
   Paystack metadata as a fallback lookup.
 - Values imported by server code must not come from a `"use client"` file
   (you get a client reference, not the value) — put shared constants in a plain module.
+- Laptop finder: only requirements go to the AI (never name/phone/email); in-store data comes
+  from `public_products`; AI product ids are re-validated against the in-stock list. Leads are
+  saved even when the AI fails. Limit: 3 requests per phone per 24h + honeypot field.
+  Calendly link lives in `settings.calendly_url` (hidden when empty).
 - Order items snapshot name/price/cost at order time. `unit_cost` and `vendor_id`
   are prefilled from the product and adjusted by admin after sourcing.
 - Status changes are logged automatically by a DB trigger into
   `order_status_history`; don't insert history rows manually for status changes.
 - Profit = total − Σ(unit_cost × qty) − rider_cost − payment_fee (`order_profit` view).
+- Revenue/profit stats count only `delivered` + `completed` orders (by created_at, Lagos time).
+  "Real" orders = pay on delivery OR paid online; unpaid Paystack orders sit in the "Unpaid online" tab.
+- Status changes go through `updateOrderStatus` (checks `canTransition` + guards: vendor on every
+  item before vendor_confirmed, rider before rider_assigned, paid before completed).
+  Notes are attached to the history row the trigger writes.
 - Delivery fee comes from the chosen zone (priced by distance from the hub); admin
   can override `delivery_fee` / `rider_cost` per order after negotiating offline.
 - Schema changes: new migration via `npx supabase migration new <name>`, never edit
@@ -160,5 +179,5 @@ Work stage by stage and stop for review after each:
 2. ✅ Admin auth + CRUD (products + images, vendors, riders, zones, settings)
 3. ✅ Storefront: home (landing), listing/search, product page, cart (localStorage), SEO
 4. ✅ Checkout, order creation, Paystack + webhook, pay on delivery
-5. Admin orders: status flow, assignment, WhatsApp buttons, profit, dashboard
+5. ✅ Admin orders: status flow, assignment, WhatsApp buttons, profit, dashboard
 6. Order tracking, polish, deploy

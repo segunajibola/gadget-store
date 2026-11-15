@@ -62,6 +62,14 @@ export function Header({ storeName }: { storeName: string }) {
               </Link>
             </li>
           ))}
+          <li className="ml-auto">
+            <Link
+              href="/laptop-finder"
+              className="block whitespace-nowrap rounded px-3 py-1.5 font-medium text-brand-700 hover:bg-brand-50"
+            >
+              ✨ Help me choose a laptop
+            </Link>
+          </li>
         </ul>
       </nav>
     </header>

@@ -113,5 +113,5 @@ All amounts are stored as **integer kobo** (₦1 = 100 kobo). Use
 2. ✅ Admin auth + CRUD (products with images, vendors, riders, zones, settings)
 3. ✅ Storefront: home, listing, product page, cart
 4. ✅ Checkout, orders, Paystack (test) + webhook, pay on delivery
-5. Admin orders: status flow, assignment, WhatsApp, profit, dashboard
+5. ✅ Admin orders: status flow, assignment, WhatsApp, profit, dashboard
 6. Order tracking, polish, deploy to Vercel

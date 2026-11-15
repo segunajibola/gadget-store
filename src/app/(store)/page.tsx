@@ -3,7 +3,7 @@
  * shows categories and products as the visitor scrolls.
  */
 import Link from "next/link";
-import { BadgeCheck, ChevronRight, ClipboardCheck, PackageCheck, ShieldCheck, Truck, Wallet, Bike } from "lucide-react";
+import { BadgeCheck, Bike, CalendarDays, ChevronRight, ClipboardCheck, PackageCheck, ShieldCheck, Sparkles, Truck, Wallet } from "lucide-react";
 import { CATEGORIES, type Category } from "@/lib/constants";
 import { HERO, HUB_LABEL, TAGLINE } from "@/lib/brand";
 import { formatNaira } from "@/lib/money";
@@ -132,6 +132,49 @@ export default async function HomePage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      {/* ---------- Help choosing ---------- */}
+      <section className="mx-auto max-w-6xl px-4 pb-12" aria-labelledby="help-heading">
+        <div className="rounded-xl border border-brand-200 bg-brand-50 p-6 md:p-8">
+          <h2 id="help-heading" className="text-2xl font-bold">
+            Not sure which laptop is right for you?
+          </h2>
+          <p className="mt-2 max-w-2xl text-slate-700">
+            Don&apos;t guess. Tell us what you&apos;ll use it for and your budget, and we&apos;ll help you pick the right
+            one — even if we have to source it for you.
+          </p>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            {settings.calendlyUrl && (
+              <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-5">
+                <CalendarDays className="h-6 w-6 text-brand-600" aria-hidden="true" />
+                <p className="mt-3 font-semibold text-slate-900">Book a free consultation call</p>
+                <p className="mt-1 flex-1 text-sm text-slate-500">
+                  A quick call with us to understand your work and recommend the right laptop. No pressure, no cost.
+                </p>
+                <a
+                  href={settings.calendlyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex w-fit items-center gap-2 rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
+                  Book a free call
+                </a>
+              </div>
+            )}
+            <div className="flex flex-col rounded-lg border border-slate-200 bg-white p-5">
+              <Sparkles className="h-6 w-6 text-brand-600" aria-hidden="true" />
+              <p className="mt-3 font-semibold text-slate-900">Use our laptop finder</p>
+              <p className="mt-1 flex-1 text-sm text-slate-500">
+                Answer a few questions — programming or office work, new or used, Dell or HP, your budget — and get
+                instant recommendations.
+              </p>
+              <ButtonLink href="/laptop-finder" size="sm" className="mt-4 w-fit">
+                Find my laptop
+              </ButtonLink>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* ---------- Categories ---------- */}

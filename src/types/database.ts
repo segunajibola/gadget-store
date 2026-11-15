@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      laptop_requests: {
+        Row: {
+          admin_notes: string | null
+          ai_suggestions: Json | null
+          ai_summary: string | null
+          brands: string[]
+          budget_max: number
+          condition_pref: string
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string
+          ram: string | null
+          screen: string | null
+          status: string
+          storage: string | null
+          updated_at: string
+          use_case: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          ai_suggestions?: Json | null
+          ai_summary?: string | null
+          brands?: string[]
+          budget_max: number
+          condition_pref: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone: string
+          ram?: string | null
+          screen?: string | null
+          status?: string
+          storage?: string | null
+          updated_at?: string
+          use_case: string
+        }
+        Update: {
+          admin_notes?: string | null
+          ai_suggestions?: Json | null
+          ai_summary?: string | null
+          brands?: string[]
+          budget_max?: number
+          condition_pref?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string
+          ram?: string | null
+          screen?: string | null
+          status?: string
+          storage?: string | null
+          updated_at?: string
+          use_case?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           created_at: string
@@ -369,6 +432,7 @@ export type Database = {
       }
       settings: {
         Row: {
+          calendly_url: string | null
           hub_address: string
           id: boolean
           pod_max_order_value: number
@@ -378,6 +442,7 @@ export type Database = {
           whatsapp_number: string
         }
         Insert: {
+          calendly_url?: string | null
           hub_address?: string
           id?: boolean
           pod_max_order_value?: number
@@ -387,6 +452,7 @@ export type Database = {
           whatsapp_number: string
         }
         Update: {
+          calendly_url?: string | null
           hub_address?: string
           id?: boolean
           pod_max_order_value?: number

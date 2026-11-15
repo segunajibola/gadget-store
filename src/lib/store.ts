@@ -16,13 +16,14 @@ export type StoreSettings = {
   whatsappNumber: string; // 234…
   supportEmail: string | null;
   podMaxOrderValue: number; // kobo
+  calendlyUrl: string | null; // free consultation booking link
 };
 
 export const getSettings = cache(async (): Promise<StoreSettings> => {
   const db = createPublicClient();
   const { data, error } = await db
     .from("settings")
-    .select("store_name, whatsapp_number, support_email, pod_max_order_value")
+    .select("store_name, whatsapp_number, support_email, pod_max_order_value, calendly_url")
     .single();
   if (error) throw error;
   return {
@@ -30,6 +31,7 @@ export const getSettings = cache(async (): Promise<StoreSettings> => {
     whatsappNumber: data.whatsapp_number,
     supportEmail: data.support_email,
     podMaxOrderValue: data.pod_max_order_value,
+    calendlyUrl: data.calendly_url,
   };
 });
 

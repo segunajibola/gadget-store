@@ -55,6 +55,18 @@ export default async function SettingsPage() {
               className={inputCls}
             />
           </Field>
+          <Field
+            label="Free consultation booking link (Calendly)"
+            hint="e.g. https://calendly.com/your-name/laptop-consultation — leave blank to hide the 'Book a call' buttons"
+          >
+            <input
+              name="calendly_url"
+              type="url"
+              placeholder="https://calendly.com/…"
+              defaultValue={s.calendly_url ?? ""}
+              className={inputCls}
+            />
+          </Field>
         </ActionForm>
       </div>
     </>
