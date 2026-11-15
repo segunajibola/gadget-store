@@ -1,3 +1,4 @@
+import { MoneyInput } from "@/components/admin/MoneyInput";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/auth";
 import { CATEGORIES, CONDITIONS, STOCK_STATUSES } from "@/lib/constants";
@@ -116,22 +117,10 @@ export default async function ProductPage({
               </legend>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Selling price (₦)" hint="What customers pay">
-                  <input
-                    name="selling_price"
-                    inputMode="decimal"
-                    required
-                    defaultValue={product ? koboToNaira(product.selling_price) : ""}
-                    className={inputCls}
-                  />
+                  <MoneyInput name="selling_price" required defaultValue={product ? koboToNaira(product.selling_price) : ""} />
                 </Field>
                 <Field label="Vendor cost (₦)" hint="Private — what you pay the vendor">
-                  <input
-                    name="cost_price"
-                    inputMode="decimal"
-                    required
-                    defaultValue={product ? koboToNaira(product.cost_price) : ""}
-                    className={inputCls}
-                  />
+                  <MoneyInput name="cost_price" required defaultValue={product ? koboToNaira(product.cost_price) : ""} />
                 </Field>
               </div>
               <Field label="Usual vendor" hint="Private — pre-fills the vendor on new orders">

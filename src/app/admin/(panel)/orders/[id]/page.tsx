@@ -17,7 +17,6 @@ import { cardCls, linkCls } from "@/components/ui/styles";
 import { WhatsAppIcon } from "@/components/store/WhatsApp";
 import { markOrderPaid, markOrderRefunded } from "../actions";
 import { FulfilmentEditor } from "./FulfilmentEditor";
-import { StatusPanel } from "./StatusPanel";
 
 export const metadata: Metadata = { title: "Order" };
 
@@ -106,13 +105,8 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-6">
-          <section className={cardCls}>
-            <h2 className="mb-3 font-semibold">Next step</h2>
-            <StatusPanel orderId={order.id} status={order.status} />
-          </section>
-
-          <section className={cardCls}>
-            <FulfilmentEditor
+          <FulfilmentEditor
+              status={order.status}
               orderId={order.id}
               orderNumber={order.order_number}
               storeName={settings.store_name}
@@ -145,7 +139,6 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
                 adminNotes: order.admin_notes ?? "",
               }}
             />
-          </section>
         </div>
 
         <div className="space-y-6">

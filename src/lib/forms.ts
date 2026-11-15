@@ -7,7 +7,7 @@
  * { error } (shown under the form) or redirects on success.
  */
 import { z } from "zod";
-import { nairaToKobo } from "@/lib/money";
+import { NAIRA_FORMAT_HINT, nairaToKobo } from "@/lib/money";
 import { normalizeNgPhone } from "@/lib/phone";
 
 export type FormState = { error?: string; message?: string } | undefined;
@@ -45,7 +45,10 @@ export const nairaAmount = (label: string) =>
   z.string().transform((v, ctx) => {
     const kobo = nairaToKobo(v);
     if (kobo === null || v.trim() === "") {
-      ctx.addIssue({ code: "custom", message: `${label} must be a valid amount` });
+      ctx.addIssue({
+        code: "custom",
+        message: `${label}: “${v}” isn't a valid amount. ${NAIRA_FORMAT_HINT}`,
+      });
       return z.NEVER;
     }
     return kobo;

@@ -1,3 +1,4 @@
+import { MoneyInput } from "@/components/admin/MoneyInput";
 import type { Metadata } from "next";
 import { adminDb } from "@/lib/auth";
 import { koboToNaira } from "@/lib/money";
@@ -47,13 +48,7 @@ export default async function SettingsPage() {
             label="Pay-on-delivery limit (₦)"
             hint="Orders above this total must pay online with Paystack"
           >
-            <input
-              name="pod_max_order_value"
-              inputMode="decimal"
-              required
-              defaultValue={koboToNaira(s.pod_max_order_value)}
-              className={inputCls}
-            />
+            <MoneyInput name="pod_max_order_value" required defaultValue={koboToNaira(s.pod_max_order_value)} />
           </Field>
           <Field
             label="Free consultation booking link (Calendly)"

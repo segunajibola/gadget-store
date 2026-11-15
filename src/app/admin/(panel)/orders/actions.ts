@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { adminDb } from "@/lib/auth";
 import { ORDER_STATUSES, type OrderStatus } from "@/lib/constants";
-import { canTransition, STATUS_ACTION_LABEL } from "@/lib/order-flow";
+import { canTransition } from "@/lib/order-flow";
 
 type Result = { ok: true; message?: string } | { ok: false; error: string };
 
@@ -72,7 +72,7 @@ export async function updateOrderStatus(orderId: string, to: OrderStatus, note?:
   }
 
   refresh(orderId);
-  return { ok: true, message: `Marked “${STATUS_ACTION_LABEL[to]}”.` };
+  return { ok: true, message: `Moved to “${ORDER_STATUSES[to]}”.` };
 }
 
 // ---------- Fulfilment: vendors, costs, rider, fees, notes -----------------

@@ -12,9 +12,11 @@ import { waLink } from "@/lib/phone";
 import { riderMessage, vendorMessage } from "@/lib/whatsapp-messages";
 import { Alert } from "@/components/ui/Alert";
 import { Button } from "@/components/ui/Button";
-import { inputCls, linkCls } from "@/components/ui/styles";
+import { cardCls, inputCls, linkCls } from "@/components/ui/styles";
 import { WhatsAppIcon } from "@/components/store/WhatsApp";
+import type { OrderStatus } from "@/lib/constants";
 import { saveFulfilment } from "../actions";
+import { StatusPanel } from "./StatusPanel";
 
 type Vendor = { id: string; name: string; phone: string | null; address: string | null; is_active: boolean };
 type Rider = { id: string; name: string; phone: string; is_active: boolean };
@@ -41,6 +43,7 @@ export type FulfilmentProps = {
   vendors: Vendor[];
   riders: Rider[];
   initial: { riderId: string | null; riderCost: number; deliveryFee: number; adminNotes: string };
+  status: OrderStatus;
 };
 
 const naira = (kobo: number) => String(koboToNaira(kobo));
@@ -106,22 +109,57 @@ export function FulfilmentEditor(p: FulfilmentProps) {
     };
   });
 
+  // ---- Unsaved-changes tracking ----
+  const payload = () => ({
+    items: items.map((i) => ({ id: i.id, vendorId: i.vendorId, unitCost: toKobo(i.cost) })),
+    riderId: riderId || null,
+    riderCost: riderCostK,
+    deliveryFee: deliveryFeeK,
+    adminNotes: notes,
+  });
+  const snapshot = JSON.stringify(payload());
+  const [savedSnapshot, setSavedSnapshot] = useState(snapshot); // what's in the DB
+  const dirty = snapshot !== savedSnapshot;
+
+  async function persist(): Promise<string | null> {
+    const res = await saveFulfilment(p.orderId, payload());
+    if (!res.ok) return res.error;
+    setSavedSnapshot(snapshot);
+    return null;
+  }
+
   function save() {
     setResult(null);
     startTransition(async () => {
-      const res = await saveFulfilment(p.orderId, {
-        items: items.map((i) => ({ id: i.id, vendorId: i.vendorId, unitCost: toKobo(i.cost) })),
-        riderId: riderId || null,
-        riderCost: riderCostK,
-        deliveryFee: deliveryFeeK,
-        adminNotes: notes,
-      });
-      setResult(res.ok ? { ok: true, text: res.message ?? "Saved." } : { ok: false, text: res.error });
+      const error = await persist();
+      setResult(error ? { ok: false, text: error } : { ok: true, text: "Saved." });
     });
   }
 
+  /**
+   * Runs before every status change: checks what's ON SCREEN (not just the
+   * DB), then saves any unsaved edits so the server checks the same data.
+   */
+  async function prepareStatusChange(to: OrderStatus): Promise<string | null> {
+    if (to === "vendor_confirmed" && items.some((i) => !i.vendorId)) {
+      return "Choose a vendor for every item before confirming.";
+    }
+    if (to === "rider_assigned" && !riderId) return "Choose a rider before marking rider assigned.";
+    if (invalid) return "Fix the highlighted amounts first.";
+    return dirty ? persist() : null;
+  }
+
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_300px]">
+    <div className="space-y-6">
+      <section className={cardCls}>
+        <h2 className="mb-3 font-semibold">Next step</h2>
+        <StatusPanel orderId={p.orderId} status={p.status} prepare={prepareStatusChange} />
+        {dirty && (
+          <p className="mt-2 text-xs text-warning-700">You have unsaved changes below — they&apos;ll be saved when you change the status.</p>
+        )}
+      </section>
+
+    <div className={`${cardCls} grid gap-6 xl:grid-cols-[1fr_300px]`}>
       <div className="space-y-6">
         {/* ---- Items ---- */}
         <section>
@@ -142,7 +180,7 @@ export function FulfilmentEditor(p: FulfilmentProps) {
                 </div>
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   <label className="space-y-1 text-sm">
-                    <span className="text-slate-500">Vendor</span>
+                    <span className="text-slate-500">Vendor for this order <span className="text-xs">(starts as the product&apos;s usual vendor — change anytime)</span></span>
                     <select
                       value={i.vendorId ?? ""}
                       onChange={(e) => updateItem(i.id, { vendorId: e.target.value || null })}
@@ -259,6 +297,7 @@ export function FulfilmentEditor(p: FulfilmentProps) {
             {pending ? "Saving…" : "Save changes"}
           </Button>
           {invalid && <span className="text-sm text-danger-700">Fix the highlighted amounts.</span>}
+          {dirty && !invalid && <span className="text-sm text-warning-700">Unsaved changes</span>}
         </div>
         {result && <Alert tone={result.ok ? "success" : "danger"}>{result.text}</Alert>}
       </div>
@@ -282,6 +321,7 @@ export function FulfilmentEditor(p: FulfilmentProps) {
         </dl>
         <p className="mt-2 text-xs text-slate-500">Updates as you edit. Save to keep changes.</p>
       </aside>
+    </div>
     </div>
   );
 }
