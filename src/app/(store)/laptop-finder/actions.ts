@@ -22,6 +22,7 @@ import {
   type UseCase,
 } from "@/lib/laptop-finder";
 import { normalizeNgPhone } from "@/lib/phone";
+import { rateLimit, TOO_MANY } from "@/lib/rate-limit";
 import { PRODUCT_COLUMNS, toProduct, type Product } from "@/lib/products";
 
 const keysOf = <T extends object>(o: T) => Object.keys(o) as [keyof T & string, ...(keyof T & string)[]];
@@ -70,6 +71,8 @@ export type LaptopFinderResult =
   | { ok: false; error: string };
 
 export async function submitLaptopRequest(input: LaptopFinderInput): Promise<LaptopFinderResult> {
+  // Each request costs an AI call — limit per visitor as well as per phone.
+  if (!(await rateLimit("laptop-finder", 5, 3600))) return { ok: false, error: TOO_MANY };
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     if (parsed.error.issues.some((i) => i.path[0] === "website")) return { ok: false, error: "Something went wrong." };

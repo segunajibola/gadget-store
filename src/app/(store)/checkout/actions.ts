@@ -11,6 +11,7 @@ import { MAX_QTY } from "@/lib/cart.shared";
 import { formatNaira } from "@/lib/money";
 import { normalizeNgPhone } from "@/lib/phone";
 import { cancelUnpaidOrder, startPaystackPayment } from "@/lib/orders";
+import { rateLimit, TOO_MANY } from "@/lib/rate-limit";
 
 const checkoutSchema = z
   .object({
@@ -34,6 +35,7 @@ const checkoutSchema = z
     notes: z.string().trim().max(500).optional(),
     zoneId: z.uuid("Choose your delivery area"),
     paymentMethod: z.enum(["paystack", "pay_on_delivery"]),
+    website: z.string().max(0, "Something went wrong.").optional(), // honeypot — hidden from humans
     items: z
       .array(
         z.object({
@@ -55,6 +57,8 @@ export type CheckoutResult =
   | { ok: false; error: string };
 
 export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> {
+  // 8 orders per hour per visitor is plenty for a real customer.
+  if (!(await rateLimit("checkout", 8, 3600))) return { ok: false, error: TOO_MANY };
   const parsed = checkoutSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
   const d = parsed.data;
@@ -148,6 +152,7 @@ export async function placeOrder(input: CheckoutInput): Promise<CheckoutResult> 
 /** "Pay now" button on the order page for unpaid Paystack orders. */
 export async function retryPayment(orderId: string): Promise<{ url?: string; error?: string }> {
   if (!z.uuid().safeParse(orderId).success) return { error: "Invalid order" };
+  if (!(await rateLimit("pay-retry", 10, 600))) return { error: TOO_MANY };
   try {
     return { url: await startPaystackPayment(orderId) };
   } catch (e) {
@@ -158,6 +163,7 @@ export async function retryPayment(orderId: string): Promise<{ url?: string; err
 /** Customer cancels an unpaid online order (checkout panel / order page). */
 export async function cancelOrder(orderId: string): Promise<{ ok: boolean; error?: string; paid?: boolean }> {
   if (!z.uuid().safeParse(orderId).success) return { ok: false, error: "Invalid order" };
+  if (!(await rateLimit("cancel", 10, 600))) return { ok: false, error: TOO_MANY };
   try {
     return await cancelUnpaidOrder(orderId);
   } catch (e) {

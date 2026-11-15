@@ -60,6 +60,9 @@ src/app/(store)/{warranty-returns,buying-guide,terms,privacy}/  DRAFT policy pag
 src/components/store/home/  TrustStrip, ShopBy (budget/need/brand), Reviews, StayInTouch
 src/lib/shop-filters.ts  budget ranges (naira, used in URLs ?min=&max=)
 src/lib/placeholders.ts  detects seeded placeholder business details (admin reminders)
+src/lib/rate-limit.ts    rateLimit(name, limit, windowSeconds) for public actions (hashed IP, Postgres, fails open)
+src/app/(store)/track/   order lookup by order number + phone → /order/<uuid> (with OrderProgress)
+src/app/api/cron/cleanup/  daily: auto-cancel unpaid Paystack orders >24h (re-verified), prune rate limits
 src/components/admin/ActionButton.tsx  button for a pre-bound Server Action (`action.bind(null, id)`)
 src/components/store/    Header, Footer, ProductCard/Grid, ProductGallery, AddToCart, CartView, WhatsApp
 src/lib/auth.ts          getAdminUser / requireAdmin / adminDb  ← admin data access layer
@@ -120,6 +123,7 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
   `is_sample` rows are labelled "Sample" on the site and flagged in admin.
 - Deals: `products.compare_at_price` ("was" price, must be > selling_price) → amber "-X%" badge.
 - Money inputs: always `<MoneyInput>` (strict format + live preview); pre-fill with `koboToNairaInput`.
+- Every PUBLIC Server Action calls `rateLimit(...)` first; public forms with free text get a hidden honeypot field.
 - Order items snapshot name/price/cost at order time. `unit_cost` and `vendor_id`
   are prefilled from the product and adjusted by admin after sourcing.
 - Status changes are logged automatically by a DB trigger into
@@ -191,4 +195,4 @@ Work stage by stage and stop for review after each:
 3. ✅ Storefront: home (landing), listing/search, product page, cart (localStorage), SEO
 4. ✅ Checkout, order creation, Paystack + webhook, pay on delivery
 5. ✅ Admin orders: status flow, assignment, WhatsApp buttons, profit, dashboard
-6. Order tracking, polish, deploy
+6. ✅ Order tracking, hardening (rate limits, headers, honeypots), error/loading pages, daily clean-up cron — deploy steps in README

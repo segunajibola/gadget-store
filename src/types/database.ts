@@ -403,6 +403,24 @@ export type Database = {
           },
         ]
       }
+      rate_limit_hits: {
+        Row: {
+          created_at: string
+          id: number
+          key: string
+        }
+        Insert: {
+          created_at?: string
+          id?: never
+          key: string
+        }
+        Update: {
+          created_at?: string
+          id?: never
+          key?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           area: string | null
@@ -716,6 +734,10 @@ export type Database = {
     }
     Functions: {
       create_order: { Args: { p_items: Json; p_order: Json }; Returns: Json }
+      hit_rate_limit: {
+        Args: { p_key: string; p_limit: number; p_window_seconds: number }
+        Returns: boolean
+      }
     }
     Enums: {
       order_status:

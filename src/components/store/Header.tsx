@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Search } from "lucide-react";
+import { PackageSearch, Search } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
 import { LogoMark } from "@/components/ui/Logo";
 import { inputCls } from "@/components/ui/styles";
@@ -34,7 +34,15 @@ export function Header({ storeName }: { storeName: string }) {
           <span className="text-lg">{storeName}</span>
         </Link>
         <SearchForm id="search-desktop" className="hidden flex-1 md:block md:max-w-md" />
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-1">
+          <Link
+            href="/track"
+            className="inline-flex h-10 items-center gap-1.5 rounded-md px-2 text-sm text-slate-700 hover:bg-brand-50 hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
+            <PackageSearch className="h-5 w-5" aria-hidden="true" />
+            <span className="hidden sm:inline">Track order</span>
+            <span className="sr-only sm:hidden">Track order</span>
+          </Link>
           <CartButton />
         </div>
       </div>

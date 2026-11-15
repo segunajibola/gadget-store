@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/auth";
 import type { FormState } from "@/lib/forms";
+import { rateLimit } from "@/lib/rate-limit";
 
 export async function login(_prev: FormState, formData: FormData): Promise<FormState> {
   const email = String(formData.get("email") ?? "").trim();
@@ -14,6 +15,8 @@ export async function login(_prev: FormState, formData: FormData): Promise<FormS
   const next = String(formData.get("next") ?? "");
 
   if (!email || !password) return { error: "Enter your email and password." };
+  // Slow down password guessing: 10 attempts per 15 minutes per visitor.
+  if (!(await rateLimit("admin-login", 10, 900))) return { error: "Too many login attempts. Wait 15 minutes and try again." };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });

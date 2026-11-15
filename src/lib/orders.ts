@@ -52,6 +52,7 @@ export async function startPaystackPayment(orderId: string): Promise<string> {
  */
 export async function cancelUnpaidOrder(
   orderId: string,
+  note = "Cancelled by customer before payment",
 ): Promise<{ ok: true } | { ok: false; error: string; paid?: boolean }> {
   const db = createAdminClient();
   const { data: order } = await db
@@ -93,7 +94,7 @@ export async function cancelUnpaidOrder(
   // The status trigger logged the change; label it for the admin timeline.
   await db
     .from("order_status_history")
-    .update({ note: "Cancelled by customer before payment" })
+    .update({ note })
     .eq("order_id", order.id)
     .eq("to_status", "cancelled")
     .is("note", null);

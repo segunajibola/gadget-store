@@ -19,6 +19,8 @@ import { Badge, OrderStatusBadge, PAYMENT_STATUS_TONE } from "@/components/ui/Ba
 import { ButtonLink } from "@/components/ui/Button";
 import { WhatsAppIcon } from "@/components/store/WhatsApp";
 import { CancelOrderButton } from "./CancelOrderButton";
+import Link from "next/link";
+import { OrderProgress } from "@/components/store/OrderProgress";
 import { ClearCartWhenDone } from "./ClearCartWhenDone";
 import { PayNowButton } from "./PayNowButton";
 
@@ -114,9 +116,18 @@ export default async function OrderPage({
         <p className="mt-2 max-w-lg text-slate-700">{hero.text}</p>
         <p className="mt-4 rounded-md bg-slate-50 px-4 py-2 text-sm">
           Order number: <strong className="font-mono text-slate-900">{order.order_number}</strong>
-          <span className="block text-xs text-slate-500">Keep this to track your order.</span>
+          <span className="block text-xs text-slate-500">
+            Keep this to <Link href="/track" className="text-brand-600 underline hover:text-brand-700">track your order</Link>.
+          </span>
         </p>
       </div>
+
+      {/* Progress tracker (hidden while an online order is still unpaid) */}
+      {(paid || !isPaystack || order.status === "cancelled") && (
+        <div className="mx-auto mt-8 max-w-xl">
+          <OrderProgress status={order.status} />
+        </div>
+      )}
 
       {verifyFailed && (
         <div className="mt-6">

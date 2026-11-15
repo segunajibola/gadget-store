@@ -30,7 +30,7 @@ export function CheckoutForm({ zones, podMaxOrderValue }: { zones: Zone[]; podMa
   const [error, setError] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
 
-  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", address: "", notes: "", website: "" });
   const [zoneId, setZoneId] = useState("");
   const [method, setMethod] = useState<PaymentMethod>("paystack");
 
@@ -102,6 +102,12 @@ export function CheckoutForm({ zones, podMaxOrderValue }: { zones: Zone[]; podMa
 
   return (
     <form onSubmit={submit} className="grid gap-8 lg:grid-cols-[1fr_360px]">
+      {/* Honeypot: hidden from people and screen readers; bots tend to fill every field */}
+      <div className="hidden" aria-hidden="true">
+        <label>
+          Website <input tabIndex={-1} autoComplete="off" value={form.website} onChange={set("website")} />
+        </label>
+      </div>
       {!podAllowed && (
         <div className="lg:col-span-2">
           <Alert tone="info">

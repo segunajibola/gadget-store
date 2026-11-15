@@ -7,6 +7,7 @@
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { REVIEW_PHOTOS_BUCKET } from "@/lib/images";
+import { rateLimit, TOO_MANY } from "@/lib/rate-limit";
 
 const PHOTO_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
@@ -35,6 +36,7 @@ export async function createReviewPhotoUpload(
   orderId: string,
   contentType: string,
 ): Promise<{ path: string; token: string } | { error: string }> {
+  if (!(await rateLimit("review-photo", 10, 3600))) return { error: TOO_MANY };
   const check = await reviewableOrder(orderId);
   if ("error" in check) return { error: check.error! };
   if (!PHOTO_TYPES.includes(contentType)) return { error: "Use a JPG, PNG or WebP photo." };
@@ -57,6 +59,7 @@ export async function submitReview(
   orderId: string,
   input: z.input<typeof reviewSchema>,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  if (!(await rateLimit("review", 10, 3600))) return { ok: false, error: TOO_MANY };
   const parsed = reviewSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
   const check = await reviewableOrder(orderId);

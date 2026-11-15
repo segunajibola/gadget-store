@@ -16,6 +16,7 @@ export function PolicyPage({ title, intro, updated, children }: { title: string;
 }
 
 export const POLICY_LINKS = [
+  { href: "/track", label: "Track your order" },
   { href: "/warranty-returns", label: "Warranty & returns" },
   { href: "/buying-guide", label: "New vs UK-used vs refurbished" },
   { href: "/terms", label: "Terms of sale" },

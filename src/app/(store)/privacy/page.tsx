@@ -51,7 +51,8 @@ export default async function PrivacyPage() {
       <section>
         <h2>Cookies & storage</h2>
         <p>
-          We store your cart in your browser so it&apos;s still there when you come back. We don&apos;t use advertising
+          We store your cart in your browser so it&apos;s still there when you come back. To prevent abuse, we keep a
+          short-lived, anonymised (hashed) record of form submissions for up to one day. We don&apos;t use advertising
           trackers.
         </p>
       </section>

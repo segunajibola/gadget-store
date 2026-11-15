@@ -107,6 +107,45 @@ confirms payments. After deploying, set in Paystack → Settings → API Keys & 
 All amounts are stored as **integer kobo** (₦1 = 100 kobo). Use
 `formatNaira()` / `nairaToKobo()` from `src/lib/money.ts` at the edges.
 
+## Deploying to Vercel
+
+### 1. Create the project
+1. (Recommended) make the GitHub repo **private**.
+2. vercel.com → sign in with GitHub → **Add New… → Project** → import `gadget-store`.
+   Framework is detected as Next.js; leave build settings as they are.
+3. Before clicking Deploy, open **Environment Variables** and add every variable
+   from `.env.local` (all environments):
+
+| Variable | Value |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` | same as `.env.local` |
+| `PAYSTACK_SECRET_KEY`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | **test** keys for now |
+| `ADMIN_EMAILS`, `ANTHROPIC_API_KEY` | same as `.env.local` |
+| `CRON_SECRET` | a new random string (see `.env.example`) |
+| `NEXT_PUBLIC_SITE_URL` | `https://<your-project>.vercel.app` (no trailing slash) |
+
+4. **Deploy.** If the URL Vercel gives you differs from what you guessed, update
+   `NEXT_PUBLIC_SITE_URL` and **redeploy** (NEXT_PUBLIC values are baked in at build time).
+
+### 2. Connect the services
+- **Paystack** → Settings → API Keys & Webhooks → *Test Webhook URL*:
+  `https://<your-domain>/api/paystack/webhook`
+- **Supabase** → Authentication → URL Configuration → *Site URL*: your live URL.
+- The daily clean-up job (`vercel.json`) starts automatically after deploy.
+
+### 3. Test on the live site (still test keys)
+Place a Paystack order with the test card, then check Paystack → Developers/Logs
+that the webhook returned **200**; place a pay-on-delivery order; walk an order
+through admin; try `/track`, the laptop finder and a review.
+
+### 4. Go live
+1. Complete **Paystack business activation**, then switch to the `sk_live_` / `pk_live_`
+   keys in Vercel, set the **Live Webhook URL**, and redeploy.
+2. Replace placeholders in Admin → Settings (CAC number, Instagram), delete the
+   sample review, and review the draft warranty / terms / privacy pages.
+3. Optional: add a custom domain in Vercel → Settings → Domains, then update
+   `NEXT_PUBLIC_SITE_URL`, the Paystack webhook URL and Supabase Site URL, and redeploy.
+
 ## Build stages
 
 1. ✅ Setup, schema, migrations, RLS
@@ -114,4 +153,4 @@ All amounts are stored as **integer kobo** (₦1 = 100 kobo). Use
 3. ✅ Storefront: home, listing, product page, cart
 4. ✅ Checkout, orders, Paystack (test) + webhook, pay on delivery
 5. ✅ Admin orders: status flow, assignment, WhatsApp, profit, dashboard
-6. Order tracking, polish, deploy to Vercel
+6. ✅ Order tracking, rate limits, security headers, error pages, clean-up job — deploy: see above
