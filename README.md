@@ -38,7 +38,7 @@ The CLI is installed as a dev dependency, so use `npx supabase ...`.
 ```bash
 npx supabase login                       # opens browser, one-time
 npx supabase link --project-ref <ref>    # <ref> = the id in your project URL; asks for DB password
-npx supabase db push                     # runs everything in supabase/migrations
+npm run db:push                          # = supabase db push --remote (CLI v3 targets local unless --remote)
 npm run db:types                         # generates src/types/database.ts from your schema
 ```
 
@@ -51,7 +51,7 @@ Migrations (run in order):
 | `…04_initial_data.sql` | settings row + starter Lagos delivery zones (placeholder fees) |
 
 To change the schema later: `npx supabase migration new <name>`, write SQL,
-then `npx supabase db push`. Never edit a migration that has already been pushed.
+then `npm run db:push`. Never edit a migration that has already been pushed.
 
 ### 4. Create your admin user
 Supabase → Authentication → Users → **Add user** → enter email + password
@@ -84,7 +84,7 @@ All amounts are stored as **integer kobo** (₦1 = 100 kobo). Use
 
 ## Build stages
 1. ✅ Setup, schema, migrations, RLS
-2. Admin auth + CRUD (products with images, vendors, riders, zones)
+2. ✅ Admin auth + CRUD (products with images, vendors, riders, zones, settings)
 3. Storefront: home, listing, product page, cart
 4. Checkout, orders, Paystack (test) + webhook, pay on delivery
 5. Admin orders: status flow, assignment, WhatsApp, profit, dashboard
