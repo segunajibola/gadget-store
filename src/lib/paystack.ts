@@ -13,15 +13,27 @@ const API = "https://api.paystack.co";
 type PaystackResponse<T> = { status: boolean; message: string; data: T };
 
 async function paystack<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${serverEnv.paystackSecretKey}`,
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-    cache: "no-store", // never cache payment API calls
-  });
+  const request = () =>
+    fetch(`${API}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${serverEnv.paystackSecretKey}`,
+        "Content-Type": "application/json",
+        ...init?.headers,
+      },
+      cache: "no-store", // never cache payment API calls
+      signal: AbortSignal.timeout(15_000),
+    });
+
+  // Retry once on a network failure (DNS hiccup, timeout). HTTP errors
+  // (4xx/5xx) are real answers from Paystack and are not retried.
+  let res: Response;
+  try {
+    res = await request();
+  } catch {
+    await new Promise((r) => setTimeout(r, 1000));
+    res = await request();
+  }
   const body = (await res.json()) as PaystackResponse<T>;
   if (!res.ok || !body.status) {
     throw new Error(`Paystack ${path} failed: ${body.message ?? res.statusText}`);

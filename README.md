@@ -74,6 +74,23 @@ Open http://localhost:3000.
 
 ---
 
+## Payments (Paystack)
+
+Flow: checkout → `placeOrder` Server Action creates the order (prices from the
+DB, `create_order` SQL function) → Paystack payment page → Paystack redirects to
+`/api/paystack/callback` → server **verifies** with Paystack → `/order/<id>`.
+`/api/paystack/webhook` does the same verification server-to-server, so payments
+are recorded even if the customer closes the tab.
+
+**Test payment** (with `sk_test_…` keys) — on Paystack's page use:
+card `4084 0840 8408 4081`, any future expiry, CVV `408`, PIN `0000`, OTP `123456`.
+
+**Webhook URL** — Paystack can't reach `localhost`, so locally the callback alone
+confirms payments. After deploying, set in Paystack → Settings → API Keys & Webhooks
+→ *Test Webhook URL*: `https://<your-domain>/api/paystack/webhook`.
+
+---
+
 ## Security model (short version)
 
 - The browser only ever sees the **anon key**, which can read just
@@ -95,6 +112,6 @@ All amounts are stored as **integer kobo** (₦1 = 100 kobo). Use
 1. ✅ Setup, schema, migrations, RLS
 2. ✅ Admin auth + CRUD (products with images, vendors, riders, zones, settings)
 3. ✅ Storefront: home, listing, product page, cart
-4. Checkout, orders, Paystack (test) + webhook, pay on delivery
+4. ✅ Checkout, orders, Paystack (test) + webhook, pay on delivery
 5. Admin orders: status flow, assignment, WhatsApp, profit, dashboard
 6. Order tracking, polish, deploy to Vercel

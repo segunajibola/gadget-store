@@ -39,6 +39,12 @@ src/lib/store.ts         storefront queries (getSettings, searchProducts, getPro
 src/lib/products.ts      public Product type + toProduct() mapper for public_products rows
 src/lib/cart.ts          localStorage cart (useSyncExternalStore): useCart, cartActions
 src/lib/brand.ts         marketing copy (tagline, hero text)
+src/lib/cart.shared.ts   cart constants usable from server code (MAX_QTY)
+src/lib/paystack.ts      Paystack API (initialize, verify, webhook signature) — server only
+src/lib/orders.ts        startPaystackPayment(), confirmPaystackPayment() (idempotent) — server only
+src/app/(store)/checkout/actions.ts   placeOrder / retryPayment Server Actions (public, untrusted input)
+src/app/(store)/order/[id]/           customer order page (UUID link; customer-safe columns only)
+src/app/api/paystack/callback|webhook route handlers
 src/components/store/    Header, Footer, ProductCard/Grid, ProductGallery, AddToCart, CartView, WhatsApp
 src/lib/auth.ts          getAdminUser / requireAdmin / adminDb  ← admin data access layer
 src/lib/forms.ts         FormState type, zod field helpers (nairaAmount, ngPhone…), dbErrorMessage
@@ -81,6 +87,14 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
 - **Payments are verified server-side** (Paystack verify API + HMAC-SHA512 webhook
   signature using `PAYSTACK_SECRET_KEY`). Store the actual Paystack fee in
   `orders.payment_fee`. Pay-on-delivery only when total ≤ `settings.pod_max_order_value`.
+- Orders are created only via the `create_order(p_order, p_items)` SQL function
+  (one transaction; service role only). Only product ids + qty come from the browser.
+- Mark orders paid only through `confirmPaystackPayment()` — it re-verifies with
+  Paystack, checks amount ≥ total and currency NGN, and is safe to call repeatedly.
+  Each payment attempt needs a new reference (`newReference`); the order id is in
+  Paystack metadata as a fallback lookup.
+- Values imported by server code must not come from a `"use client"` file
+  (you get a client reference, not the value) — put shared constants in a plain module.
 - Order items snapshot name/price/cost at order time. `unit_cost` and `vendor_id`
   are prefilled from the product and adjusted by admin after sourcing.
 - Status changes are logged automatically by a DB trigger into
@@ -145,6 +159,6 @@ Work stage by stage and stop for review after each:
 1. ✅ Setup, schema, RLS, README
 2. ✅ Admin auth + CRUD (products + images, vendors, riders, zones, settings)
 3. ✅ Storefront: home (landing), listing/search, product page, cart (localStorage), SEO
-4. Checkout, order creation, Paystack + webhook, pay on delivery
+4. ✅ Checkout, order creation, Paystack + webhook, pay on delivery
 5. Admin orders: status flow, assignment, WhatsApp buttons, profit, dashboard
 6. Order tracking, polish, deploy

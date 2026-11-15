@@ -1,17 +1,29 @@
 import type { Metadata } from "next";
-import { ButtonLink } from "@/components/ui/Button";
+import { createPublicClient } from "@/lib/supabase/public";
+import { getSettings } from "@/lib/store";
+import { CheckoutForm } from "./CheckoutForm";
 
 export const metadata: Metadata = { title: "Checkout", robots: { index: false } };
 
-// Placeholder — real checkout (delivery details, Paystack, pay on delivery) is stage 4.
-export default function CheckoutPage() {
+// Always fresh: zones/fees and the pay-on-delivery limit must be current.
+export const dynamic = "force-dynamic";
+
+export default async function CheckoutPage() {
+  const db = createPublicClient();
+  const [{ data: zones }, settings] = await Promise.all([
+    db
+      .from("zones")
+      .select("id, name, areas, delivery_fee")
+      .eq("is_active", true)
+      .order("sort_order")
+      .order("name"),
+    getSettings(),
+  ]);
+
   return (
-    <div className="mx-auto max-w-xl px-4 py-16 text-center">
-      <h1 className="text-2xl font-bold">Checkout is coming soon</h1>
-      <p className="mt-2 text-slate-500">This page is built in the next stage.</p>
-      <ButtonLink href="/cart" variant="secondary" className="mt-6">
-        Back to cart
-      </ButtonLink>
+    <div className="mx-auto max-w-6xl px-4 py-8">
+      <h1 className="mb-6 text-2xl font-bold md:text-3xl">Checkout</h1>
+      <CheckoutForm zones={zones ?? []} podMaxOrderValue={settings.podMaxOrderValue} />
     </div>
   );
 }

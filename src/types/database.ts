@@ -535,7 +535,7 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      create_order: { Args: { p_items: Json; p_order: Json }; Returns: Json }
     }
     Enums: {
       order_status:

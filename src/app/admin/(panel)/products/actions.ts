@@ -58,6 +58,11 @@ const productSchema = z
     is_featured: z.boolean(),
     is_active: z.boolean(),
   })
+  // Never sell at a loss by mistake.
+  .refine((p) => p.cost_price <= p.selling_price, {
+    message: "Vendor cost can't be higher than the selling price.",
+    path: ["cost_price"],
+  })
   // Blank slug → generate from name.
   .transform((p) => ({ ...p, slug: slugify(p.slug || p.name) }))
   .refine((p) => p.slug.length > 0, { message: "Slug can't be empty" });

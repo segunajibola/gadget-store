@@ -12,6 +12,9 @@
  * server from the database.
  */
 import { useSyncExternalStore } from "react";
+import { MAX_QTY } from "@/lib/cart.shared";
+
+export { MAX_QTY };
 
 export type CartItem = {
   productId: string;
@@ -22,7 +25,6 @@ export type CartItem = {
   qty: number;
 };
 
-export const MAX_QTY = 10;
 const STORAGE_KEY = "gs_cart_v1";
 const EMPTY: CartItem[] = [];
 
@@ -108,6 +110,61 @@ export function useCart() {
   const count = items.reduce((n, i) => n + i.qty, 0);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.qty, 0);
   return { items, count, subtotal };
+}
+
+// ---------- Pending (unpaid) online order -----------------------------------
+// After checkout creates a Paystack order we keep the cart AND remember the
+// order, so a customer who cancels on Paystack can come back and finish
+// paying instead of losing their cart or placing a duplicate order.
+
+export type PendingOrder = { id: string; orderNumber: string };
+const PENDING_KEY = "gs_pending_order_v1";
+let pendingCache: PendingOrder | null | undefined; // undefined = not read yet
+const pendingListeners = new Set<() => void>();
+
+function readPending(): PendingOrder | null {
+  if (pendingCache !== undefined) return pendingCache;
+  try {
+    pendingCache = JSON.parse(localStorage.getItem(PENDING_KEY) ?? "null");
+  } catch {
+    pendingCache = null;
+  }
+  return pendingCache ?? null;
+}
+
+function writePending(value: PendingOrder | null) {
+  pendingCache = value;
+  try {
+    if (value) localStorage.setItem(PENDING_KEY, JSON.stringify(value));
+    else localStorage.removeItem(PENDING_KEY);
+  } catch {
+    // ignore storage errors
+  }
+  pendingListeners.forEach((l) => l());
+}
+
+function subscribePending(listener: () => void) {
+  pendingListeners.add(listener);
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === PENDING_KEY) {
+      pendingCache = undefined;
+      listener();
+    }
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    pendingListeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+export const pendingOrderActions = {
+  set: (order: PendingOrder) => writePending(order),
+  clear: () => writePending(null),
+};
+
+export function usePendingOrder(): PendingOrder | null {
+  return useSyncExternalStore(subscribePending, readPending, () => null);
 }
 
 /** false on the server and during hydration, true once running in the browser. */

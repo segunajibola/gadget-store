@@ -30,12 +30,75 @@ export async function startPaystackPayment(orderId: string): Promise<string> {
     amount: order.total!,
     reference,
     callbackUrl: `${publicEnv.siteUrl}/api/paystack/callback`,
-    metadata: { order_id: order.id, order_number: order.order_number },
+    metadata: {
+      order_id: order.id,
+      order_number: order.order_number,
+      // Where Paystack sends the customer if they press "Cancel" on its page.
+      cancel_action: `${publicEnv.siteUrl}/order/${order.id}?payment=cancelled`,
+    },
   });
 
   // Remember the latest reference so the callback/webhook can find the order.
   await db.from("orders").update({ paystack_reference: reference }).eq("id", order.id);
   return tx.authorization_url;
+}
+
+/**
+ * Customer cancels an UNPAID online order (e.g. changed their mind on
+ * Paystack's page). Only allowed while the order is still "new" and unpaid.
+ *
+ * Before cancelling we re-check with Paystack, in case they actually paid
+ * and the webhook simply hasn't arrived yet — we must never cancel a paid order.
+ */
+export async function cancelUnpaidOrder(
+  orderId: string,
+): Promise<{ ok: true } | { ok: false; error: string; paid?: boolean }> {
+  const db = createAdminClient();
+  const { data: order } = await db
+    .from("orders")
+    .select("id, payment_method, payment_status, status, paystack_reference")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) return { ok: false, error: "Order not found." };
+  if (order.status === "cancelled") return { ok: true };
+  if (order.payment_method !== "paystack" || order.status !== "new") {
+    return { ok: false, error: "This order can't be cancelled online. Please chat with us on WhatsApp." };
+  }
+  if (order.payment_status === "paid") {
+    return { ok: false, paid: true, error: "This order has already been paid, so it can't be cancelled here." };
+  }
+
+  if (order.paystack_reference) {
+    try {
+      const { paid } = await confirmPaystackPayment(order.paystack_reference);
+      if (paid) {
+        return { ok: false, paid: true, error: "Good news — we've received your payment, so this order is confirmed." };
+      }
+    } catch {
+      return { ok: false, error: "We couldn't check your payment status. Please try again in a moment." };
+    }
+  }
+
+  // Conditions in the WHERE clause guard against a payment landing in between.
+  const { data: updated, error } = await db
+    .from("orders")
+    .update({ status: "cancelled" })
+    .eq("id", order.id)
+    .eq("status", "new")
+    .neq("payment_status", "paid")
+    .select("id");
+  if (error) throw error;
+  if (!updated?.length) return { ok: false, error: "This order changed while cancelling. Please refresh the page." };
+
+  // The status trigger logged the change; label it for the admin timeline.
+  await db
+    .from("order_status_history")
+    .update({ note: "Cancelled by customer before payment" })
+    .eq("order_id", order.id)
+    .eq("to_status", "cancelled")
+    .is("note", null);
+
+  return { ok: true };
 }
 
 export type PaymentResult = { orderId: string | null; paid: boolean };
