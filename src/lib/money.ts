@@ -37,7 +37,18 @@ export function nairaToKobo(input: string | number): number | null {
 
 export const NAIRA_FORMAT_HINT = "Use digits, e.g. 300000 or 300,000 (commas only between thousands, optional .50 for kobo).";
 
-/** kobo → plain naira number for form inputs, e.g. 125000000 → 1250000 */
+/** kobo → plain naira number, e.g. 125000000 → 1250000 */
 export function koboToNaira(kobo: number): number {
   return kobo / 100;
+}
+
+const inputFormatter = new Intl.NumberFormat("en-NG", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+/**
+ * kobo → text for pre-filling money inputs, readable and re-parseable by
+ * nairaToKobo(): 125000000 → "1,250,000", 150050 → "1,500.50".
+ */
+export function koboToNairaInput(kobo: number): string {
+  const naira = kobo / 100;
+  return kobo % 100 === 0 ? inputFormatter.format(naira) : naira.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }

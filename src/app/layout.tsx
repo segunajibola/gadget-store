@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#18317a", // brand-900; browser UI colour on mobile (must be a literal value)
+  themeColor: "#0c3f72", // brand-900; browser UI colour on mobile (must be a literal value)
 };
 
 // The root layout wraps EVERY page (storefront and admin). It must render <html> and <body>.

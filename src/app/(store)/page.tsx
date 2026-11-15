@@ -3,26 +3,32 @@
  * shows categories and products as the visitor scrolls.
  */
 import Link from "next/link";
-import { BadgeCheck, Bike, CalendarDays, ChevronRight, ClipboardCheck, PackageCheck, ShieldCheck, Sparkles, Truck, Wallet } from "lucide-react";
+import { BadgeCheck, Bike, CalendarDays, ChevronRight, ClipboardCheck, Flame, PackageCheck, ShieldCheck, Sparkles, Truck, Wallet } from "lucide-react";
 import { CATEGORIES, type Category } from "@/lib/constants";
 import { HERO, HUB_LABEL, TAGLINE } from "@/lib/brand";
 import { formatNaira } from "@/lib/money";
 import { waLink } from "@/lib/phone";
-import { getFeaturedProducts, getNewestProducts, getSettings } from "@/lib/store";
+import { getApprovedReviews, getDeals, getFeaturedProducts, getNewestProducts, getSettings } from "@/lib/store";
 import { ButtonLink } from "@/components/ui/Button";
 import { CategoryIcon } from "@/components/store/CategoryIcon";
 import { ProductGrid } from "@/components/store/ProductCard";
 import { WhatsAppIcon } from "@/components/store/WhatsApp";
+import { Reviews } from "@/components/store/home/Reviews";
+import { ShopByBrand, ShopByBudget, ShopByNeed } from "@/components/store/home/ShopBy";
+import { StayInTouch } from "@/components/store/home/StayInTouch";
+import { TrustStrip } from "@/components/store/home/TrustStrip";
 
 // ISR: serve a cached copy, rebuild at most every 5 minutes. Admin edits
 // clear the cache immediately via revalidatePath().
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [settings, featured, newest] = await Promise.all([
+  const [settings, featured, newest, deals, reviews] = await Promise.all([
     getSettings(),
     getFeaturedProducts(8),
     getNewestProducts(8),
+    getDeals(4),
+    getApprovedReviews(6),
   ]);
   const showcase = featured.length ? featured : newest;
   const chatLink = waLink(settings.whatsappNumber, `Hi ${settings.storeName}, I need help choosing a gadget.`);
@@ -116,6 +122,8 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <TrustStrip settings={settings} />
+
       {/* ---------- Why us ---------- */}
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="why-heading">
         <h2 id="why-heading" className="text-2xl font-bold">
@@ -199,6 +207,32 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* ---------- Shop by budget / need / brand ---------- */}
+      <section className="mx-auto max-w-6xl space-y-8 px-4 py-12" aria-label="Ways to shop">
+        <ShopByBudget />
+        <ShopByNeed />
+        <ShopByBrand />
+      </section>
+
+      {/* ---------- Hot deals (only when some products have a "was" price) ---------- */}
+      {deals.length > 0 && (
+        <section className="bg-slate-50" aria-labelledby="deals-heading">
+          <div className="mx-auto max-w-6xl px-4 py-12">
+            <div className="flex items-end justify-between gap-4">
+              <h2 id="deals-heading" className="flex items-center gap-2 text-2xl font-bold">
+                <Flame className="h-6 w-6 text-accent" aria-hidden="true" /> Hot deals
+              </h2>
+              <Link href="/products?deals=1" className="inline-flex items-center text-sm font-medium text-brand-600 hover:text-brand-700">
+                All deals <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="mt-6">
+              <ProductGrid products={deals} />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ---------- Products ---------- */}
       <section className="mx-auto max-w-6xl px-4 py-12" aria-labelledby="products-heading">
         <div className="flex items-end justify-between gap-4">
@@ -219,6 +253,8 @@ export default async function HomePage() {
           )}
         </div>
       </section>
+
+      <Reviews {...reviews} />
 
       {/* ---------- How it works ---------- */}
       <section className="bg-slate-50" aria-labelledby="how-heading">
@@ -264,7 +300,15 @@ export default async function HomePage() {
             </details>
           ))}
         </div>
+        <p className="mt-4 text-sm text-slate-700">
+          More answers:{" "}
+          <Link href="/warranty-returns" className="text-brand-600 underline hover:text-brand-700">warranty &amp; returns</Link>
+          {" · "}
+          <Link href="/buying-guide" className="text-brand-600 underline hover:text-brand-700">new vs UK-used vs refurbished</Link>
+        </p>
       </section>
+
+      <StayInTouch settings={settings} />
 
       {/* ---------- Final CTA ---------- */}
       <section className="mx-auto max-w-6xl px-4">

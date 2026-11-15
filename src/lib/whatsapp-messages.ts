@@ -69,6 +69,7 @@ export function customerMessage(o: {
   status: OrderStatus;
   riderName?: string | null;
   riderPhone?: string | null;
+  reviewUrl?: string; // included once delivered
 }): string {
   const first = o.customerName.split(" ")[0];
   const hi = `Hi ${first}, this is ${o.storeName} about your order ${o.orderNumber}.`;
@@ -84,7 +85,10 @@ export function customerMessage(o: {
       ].join("\n");
     case "delivered":
     case "completed":
-      return `${hi}\nThanks for shopping with us! We hope you enjoy your work. 🙏 Any issues, just reply here.`;
+      return [
+        `${hi}\nThanks for shopping with us! We hope you enjoy your work. 🙏 Any issues, just reply here.`,
+        ...(o.reviewUrl ? ["", `Got a minute? Your review helps other buyers trust us ⭐\n${o.reviewUrl}`] : []),
+      ].join("\n");
     default:
       return hi;
   }

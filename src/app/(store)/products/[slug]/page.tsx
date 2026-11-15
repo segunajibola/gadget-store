@@ -12,6 +12,8 @@ import { AddToCart } from "@/components/store/AddToCart";
 import { ProductGallery } from "@/components/store/ProductGallery";
 import { ProductGrid } from "@/components/store/ProductCard";
 import { WhatsAppIcon } from "@/components/store/WhatsApp";
+import { Price } from "@/components/store/Price";
+import { discountPercent } from "@/lib/products";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -112,9 +114,10 @@ export default async function ProductPage({ params }: Props) {
           <div className="flex flex-wrap gap-2">
             <Badge tone="brand">{CONDITIONS[product.condition]}</Badge>
             <StockBadge status={product.stockStatus} />
+            {discountPercent(product) > 0 && <Badge tone="accent">Hot deal · -{discountPercent(product)}%</Badge>}
           </div>
           <h1 className="text-2xl font-bold md:text-3xl">{product.name}</h1>
-          <p className="text-3xl font-bold text-slate-900">{formatNaira(product.price)}</p>
+          <Price product={product} size="lg" />
 
           <AddToCart
             disabled={soldOut}

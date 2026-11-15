@@ -19,6 +19,7 @@ export type Product = {
   specs: { label: string; value: string }[];
   warranty: string | null;
   price: number; // kobo
+  compareAtPrice: number | null; // kobo "was" price → shows a deal badge
   stockStatus: StockStatus;
   isFeatured: boolean;
   images: { url: string; alt: string | null }[];
@@ -26,7 +27,7 @@ export type Product = {
 
 /** Columns to select from public_products (keep in sync with Product). */
 export const PRODUCT_COLUMNS =
-  "id, name, slug, category, condition, description, specs, warranty, selling_price, stock_status, is_featured, images";
+  "id, name, slug, category, condition, description, specs, warranty, selling_price, stock_status, is_featured, images, compare_at_price";
 
 /**
  * Views make every column nullable in the generated types, even though the
@@ -44,8 +45,15 @@ export function toProduct(row: ViewRow): Product {
     specs: (row.specs as Product["specs"] | null) ?? [],
     warranty: row.warranty,
     price: row.selling_price!,
+    compareAtPrice: row.compare_at_price,
     stockStatus: row.stock_status!,
     isFeatured: row.is_featured ?? false,
     images: images.map((i) => ({ url: productImageUrl(i.path), alt: i.alt })),
   };
+}
+
+/** Percentage off for a deal, e.g. 12 for 12% off. 0 when not a deal. */
+export function discountPercent(p: Pick<Product, "price" | "compareAtPrice">): number {
+  if (!p.compareAtPrice || p.compareAtPrice <= p.price) return 0;
+  return Math.round(((p.compareAtPrice - p.price) / p.compareAtPrice) * 100);
 }

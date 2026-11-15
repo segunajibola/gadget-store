@@ -23,6 +23,16 @@ const settingsSchema = z.object({
   calendly_url: optionalText.pipe(
     z.url({ protocol: /^https$/, error: "Booking link must be a full https:// link" }).nullable(),
   ),
+  cac_number: optionalText,
+  business_address: optionalText,
+  business_hours: optionalText,
+  // Accept "@handle", "handle" or a full instagram.com URL → store "handle".
+  instagram_handle: optionalText.transform((v) =>
+    v ? v.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "").replace(/^@/, "").replace(/\/.*$/, "") || null : null,
+  ),
+  whatsapp_channel_url: optionalText.pipe(
+    z.url({ protocol: /^https$/, error: "WhatsApp Channel link must be a full https:// link" }).nullable(),
+  ),
 });
 
 export async function saveSettings(_prev: FormState, formData: FormData): Promise<FormState> {

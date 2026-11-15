@@ -4,7 +4,9 @@ import { adminDb } from "@/lib/auth";
 import { formatLagosDateTime, lagosPeriodStart } from "@/lib/dates";
 import { formatNaira } from "@/lib/money";
 import { IN_PROGRESS_STATUSES, REVENUE_STATUSES } from "@/lib/order-flow";
+import { placeholderFields } from "@/lib/placeholders";
 import { EmptyState } from "@/components/admin/PageHeader";
+import { Alert } from "@/components/ui/Alert";
 import { OrderStatusBadge } from "@/components/ui/Badge";
 import { cardCls, linkCls, tableCls, tableWrapCls, tbodyCls, theadCls } from "@/components/ui/styles";
 
@@ -68,6 +70,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
   const recent = recentRes.data ?? [];
 
+  // "Before launch" reminders: placeholder business details + sample reviews.
+  const [{ data: settingsRow }, { count: sampleReviews }] = await Promise.all([
+    db.from("settings").select("cac_number, business_address, instagram_handle").single(),
+    db.from("reviews").select("id", { count: "exact", head: true }).eq("is_sample", true),
+  ]);
+  const placeholders = settingsRow ? placeholderFields(settingsRow) : [];
+
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -87,6 +96,27 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           ))}
         </div>
       </div>
+
+      {(placeholders.length > 0 || (sampleReviews ?? 0) > 0) && (
+        <div className="mb-6">
+          <Alert tone="warning">
+            <strong>Before launch:</strong>{" "}
+            {placeholders.length > 0 && (
+              <>
+                replace the placeholder {placeholders.join(", ")} in{" "}
+                <Link href="/admin/settings" className="underline">Settings</Link>.{" "}
+              </>
+            )}
+            {(sampleReviews ?? 0) > 0 && (
+              <>
+                Delete the sample review in <Link href="/admin/reviews?tab=approved" className="underline">Reviews</Link>.{" "}
+              </>
+            )}
+            Review the draft <Link href="/warranty-returns" className="underline">warranty</Link>,{" "}
+            <Link href="/terms" className="underline">terms</Link> and <Link href="/privacy" className="underline">privacy</Link> pages.
+          </Alert>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => {

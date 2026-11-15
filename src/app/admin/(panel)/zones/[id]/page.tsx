@@ -1,7 +1,7 @@
 import { MoneyInput } from "@/components/admin/MoneyInput";
 import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/auth";
-import { koboToNaira } from "@/lib/money";
+import { koboToNairaInput } from "@/lib/money";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { DeleteButton } from "@/components/admin/DeleteButton";
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -43,10 +43,10 @@ export default async function ZonePage({ params }: { params: Promise<{ id: strin
           </Field>
           <div className="grid gap-4 sm:grid-cols-3">
             <Field label="Customer fee (₦)">
-              <MoneyInput name="delivery_fee" required defaultValue={zone ? koboToNaira(zone.delivery_fee) : ""} />
+              <MoneyInput name="delivery_fee" required defaultValue={zone ? koboToNairaInput(zone.delivery_fee) : ""} />
             </Field>
             <Field label="Rider cost (₦)">
-              <MoneyInput name="default_rider_cost" required defaultValue={zone ? koboToNaira(zone.default_rider_cost) : ""} />
+              <MoneyInput name="default_rider_cost" required defaultValue={zone ? koboToNairaInput(zone.default_rider_cost) : ""} />
             </Field>
             <Field label="Approx. km from hub">
               <input

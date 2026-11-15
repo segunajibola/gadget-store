@@ -20,7 +20,13 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: `${storeName} — ${TAGLINE}`, template: `%s | ${storeName}` },
     description:
       "Laptops, accessories, networking and power gear from vetted Computer Village vendors, delivered fast across Lagos.",
-    openGraph: { siteName: storeName, locale: "en_NG", type: "website" },
+    openGraph: {
+      siteName: storeName,
+      locale: "en_NG",
+      type: "website",
+      // Preview image when the site is shared (product pages use the product photo instead).
+      images: [{ url: "/images/logo-mark.png", width: 512, height: 512, alt: storeName }],
+    },
   };
 }
 

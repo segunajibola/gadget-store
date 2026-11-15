@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { adminDb } from "@/lib/auth";
 import { CATEGORIES, CONDITIONS, STOCK_STATUSES } from "@/lib/constants";
 import { productImageUrl } from "@/lib/images";
-import { koboToNaira } from "@/lib/money";
+import { koboToNairaInput } from "@/lib/money";
 import { Alert } from "@/components/ui/Alert";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { DeleteButton } from "@/components/admin/DeleteButton";
@@ -117,12 +117,21 @@ export default async function ProductPage({
               </legend>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label="Selling price (₦)" hint="What customers pay">
-                  <MoneyInput name="selling_price" required defaultValue={product ? koboToNaira(product.selling_price) : ""} />
+                  <MoneyInput name="selling_price" required defaultValue={product ? koboToNairaInput(product.selling_price) : ""} />
                 </Field>
                 <Field label="Vendor cost (₦)" hint="Private — what you pay the vendor">
-                  <MoneyInput name="cost_price" required defaultValue={product ? koboToNaira(product.cost_price) : ""} />
+                  <MoneyInput name="cost_price" required defaultValue={product ? koboToNairaInput(product.cost_price) : ""} />
                 </Field>
               </div>
+              <Field
+                label="“Was” price (₦) — optional"
+                hint="Fill this to put the product on deal: shows a crossed-out price and a ‘% off’ badge. Leave blank otherwise."
+              >
+                <MoneyInput
+                  name="compare_at_price"
+                  defaultValue={product?.compare_at_price ? koboToNairaInput(product.compare_at_price) : ""}
+                />
+              </Field>
               <Field label="Usual vendor" hint="Private — pre-fills the vendor on new orders">
                 <select name="vendor_id" defaultValue={product?.vendor_id ?? ""} className={inputCls}>
                   <option value="">— None —</option>

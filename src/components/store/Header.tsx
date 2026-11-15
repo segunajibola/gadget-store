@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { CATEGORIES } from "@/lib/constants";
+import { LogoMark } from "@/components/ui/Logo";
 import { inputCls } from "@/components/ui/styles";
 import { CartButton } from "./CartButton";
 
@@ -28,9 +29,8 @@ export function Header({ storeName }: { storeName: string }) {
     <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3">
         <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold text-slate-900">
-          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-600 text-sm font-bold text-white" aria-hidden="true">
-            {storeName.charAt(0)}
-          </span>
+          {/* priority: the logo is visible immediately on every page */}
+          <LogoMark size={36} priority />
           <span className="text-lg">{storeName}</span>
         </Link>
         <SearchForm id="search-desktop" className="hidden flex-1 md:block md:max-w-md" />

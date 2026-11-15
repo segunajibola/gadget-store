@@ -27,16 +27,18 @@ export function LaptopFinder({
   calendlyUrl,
   whatsappNumber,
   storeName,
+  initialUseCase = "",
 }: {
   calendlyUrl: string | null;
   whatsappNumber: string;
   storeName: string;
+  initialUseCase?: string;
 }) {
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
-    useCase: "",
+    useCase: initialUseCase,
     conditionPref: "any",
     budgetMax: "",
     ram: RAM_OPTIONS[0] as string,

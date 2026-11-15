@@ -7,7 +7,8 @@
  */
 import Link from "next/link";
 import { useState, useTransition } from "react";
-import { formatNaira, koboToNaira, nairaToKobo } from "@/lib/money";
+import { formatNaira, koboToNairaInput, nairaToKobo } from "@/lib/money";
+import { MoneyInput } from "@/components/admin/MoneyInput";
 import { waLink } from "@/lib/phone";
 import { riderMessage, vendorMessage } from "@/lib/whatsapp-messages";
 import { Alert } from "@/components/ui/Alert";
@@ -46,7 +47,7 @@ export type FulfilmentProps = {
   status: OrderStatus;
 };
 
-const naira = (kobo: number) => String(koboToNaira(kobo));
+const naira = (kobo: number) => koboToNairaInput(kobo); // "310,000"
 const toKobo = (s: string) => nairaToKobo(s) ?? NaN;
 
 function WaButton({ href, children, disabled }: { href: string; children: React.ReactNode; disabled?: boolean }) {
@@ -197,12 +198,7 @@ export function FulfilmentEditor(p: FulfilmentProps) {
                   </label>
                   <label className="space-y-1 text-sm">
                     <span className="text-slate-500">Actual cost each (₦)</span>
-                    <input
-                      inputMode="decimal"
-                      value={i.cost}
-                      onChange={(e) => updateItem(i.id, { cost: e.target.value })}
-                      className={`${inputCls} ${Number.isNaN(toKobo(i.cost)) ? "border-danger" : ""}`}
-                    />
+                    <MoneyInput required value={i.cost} onChange={(v) => updateItem(i.id, { cost: v })} />
                   </label>
                 </div>
               </li>
@@ -246,21 +242,11 @@ export function FulfilmentEditor(p: FulfilmentProps) {
             </label>
             <label className="space-y-1 text-sm">
               <span className="text-slate-500">Rider cost (₦)</span>
-              <input
-                inputMode="decimal"
-                value={riderCost}
-                onChange={(e) => setRiderCost(e.target.value)}
-                className={`${inputCls} ${Number.isNaN(toKobo(riderCost)) ? "border-danger" : ""}`}
-              />
+              <MoneyInput required value={riderCost} onChange={setRiderCost} />
             </label>
             <label className="space-y-1 text-sm">
               <span className="text-slate-500">Customer delivery fee (₦)</span>
-              <input
-                inputMode="decimal"
-                value={deliveryFee}
-                onChange={(e) => setDeliveryFee(e.target.value)}
-                className={`${inputCls} ${Number.isNaN(toKobo(deliveryFee)) ? "border-danger" : ""}`}
-              />
+              <MoneyInput required value={deliveryFee} onChange={setDeliveryFee} />
             </label>
           </div>
           <WaButton

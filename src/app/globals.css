@@ -7,18 +7,23 @@
  * "Brand & Design" for which colour to use where.
  */
 @theme {
-  /* Primary brand blue — 600 is THE brand colour */
-  --color-brand-50: #eef4ff;
-  --color-brand-100: #d9e6ff;
-  --color-brand-200: #bcd3ff;
-  --color-brand-300: #8eb6ff;
-  --color-brand-400: #598dff;
-  --color-brand-500: #3366ff;
-  --color-brand-600: #1a4fe6;
-  --color-brand-700: #153fc0;
-  --color-brand-800: #17369b;
-  --color-brand-900: #18317a;
-  --color-brand-950: #111f4a;
+  /*
+   * Brand blue, built around the logo (#0280F1 = brand-500).
+   * brand-600 is the same hue a little deeper: the colour for buttons and
+   * links, because white text on the exact logo blue is below WCAG AA
+   * (3.9:1); on brand-600 it's 4.9:1.
+   */
+  --color-brand-50: #eef7ff;
+  --color-brand-100: #d9edff;
+  --color-brand-200: #bcdfff;
+  --color-brand-300: #8ecbff;
+  --color-brand-400: #59aeff;
+  --color-brand-500: #0280f1; /* logo blue — icons, highlights */
+  --color-brand-600: #0270d6; /* buttons, links (primary UI) */
+  --color-brand-700: #0459ad;
+  --color-brand-800: #084b8c;
+  --color-brand-900: #0c3f72; /* hero & footer backgrounds */
+  --color-brand-950: #0a2849;
 
   /* Accent amber — ONLY for "Hot deal" / "Featured" / discount badges */
   --color-accent: #f59e0b;

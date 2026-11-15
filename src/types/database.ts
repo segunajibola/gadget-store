@@ -338,6 +338,7 @@ export type Database = {
       products: {
         Row: {
           category: Database["public"]["Enums"]["product_category"]
+          compare_at_price: number | null
           condition: Database["public"]["Enums"]["product_condition"]
           cost_price: number
           created_at: string
@@ -356,6 +357,7 @@ export type Database = {
         }
         Insert: {
           category: Database["public"]["Enums"]["product_category"]
+          compare_at_price?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           cost_price: number
           created_at?: string
@@ -374,6 +376,7 @@ export type Database = {
         }
         Update: {
           category?: Database["public"]["Enums"]["product_category"]
+          compare_at_price?: number | null
           condition?: Database["public"]["Enums"]["product_condition"]
           cost_price?: number
           created_at?: string
@@ -396,6 +399,63 @@ export type Database = {
             columns: ["vendor_id"]
             isOneToOne: false
             referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reviews: {
+        Row: {
+          area: string | null
+          comment: string
+          created_at: string
+          customer_name: string
+          id: string
+          is_sample: boolean
+          order_id: string | null
+          photo_path: string | null
+          products: string | null
+          rating: number
+          status: string
+        }
+        Insert: {
+          area?: string | null
+          comment: string
+          created_at?: string
+          customer_name: string
+          id?: string
+          is_sample?: boolean
+          order_id?: string | null
+          photo_path?: string | null
+          products?: string | null
+          rating: number
+          status?: string
+        }
+        Update: {
+          area?: string | null
+          comment?: string
+          created_at?: string
+          customer_name?: string
+          id?: string
+          is_sample?: boolean
+          order_id?: string | null
+          photo_path?: string | null
+          products?: string | null
+          rating?: number
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "order_profit"
+            referencedColumns: ["order_id"]
+          },
+          {
+            foreignKeyName: "reviews_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
             referencedColumns: ["id"]
           },
         ]
@@ -432,33 +492,48 @@ export type Database = {
       }
       settings: {
         Row: {
+          business_address: string | null
+          business_hours: string | null
+          cac_number: string | null
           calendly_url: string | null
           hub_address: string
           id: boolean
+          instagram_handle: string | null
           pod_max_order_value: number
           store_name: string
           support_email: string | null
           updated_at: string
+          whatsapp_channel_url: string | null
           whatsapp_number: string
         }
         Insert: {
+          business_address?: string | null
+          business_hours?: string | null
+          cac_number?: string | null
           calendly_url?: string | null
           hub_address?: string
           id?: boolean
+          instagram_handle?: string | null
           pod_max_order_value?: number
           store_name?: string
           support_email?: string | null
           updated_at?: string
+          whatsapp_channel_url?: string | null
           whatsapp_number: string
         }
         Update: {
+          business_address?: string | null
+          business_hours?: string | null
+          cac_number?: string | null
           calendly_url?: string | null
           hub_address?: string
           id?: boolean
+          instagram_handle?: string | null
           pod_max_order_value?: number
           store_name?: string
           support_email?: string | null
           updated_at?: string
+          whatsapp_channel_url?: string | null
           whatsapp_number?: string
         }
         Relationships: []
@@ -554,6 +629,7 @@ export type Database = {
       public_products: {
         Row: {
           category: Database["public"]["Enums"]["product_category"] | null
+          compare_at_price: number | null
           condition: Database["public"]["Enums"]["product_condition"] | null
           created_at: string | null
           description: string | null
@@ -569,6 +645,7 @@ export type Database = {
         }
         Insert: {
           category?: Database["public"]["Enums"]["product_category"] | null
+          compare_at_price?: number | null
           condition?: Database["public"]["Enums"]["product_condition"] | null
           created_at?: string | null
           description?: string | null
@@ -584,6 +661,7 @@ export type Database = {
         }
         Update: {
           category?: Database["public"]["Enums"]["product_category"] | null
+          compare_at_price?: number | null
           condition?: Database["public"]["Enums"]["product_condition"] | null
           created_at?: string | null
           description?: string | null
@@ -596,6 +674,42 @@ export type Database = {
           specs?: Json | null
           stock_status?: Database["public"]["Enums"]["stock_status"] | null
           warranty?: string | null
+        }
+        Relationships: []
+      }
+      public_reviews: {
+        Row: {
+          area: string | null
+          comment: string | null
+          created_at: string | null
+          customer_name: string | null
+          id: string | null
+          is_sample: boolean | null
+          photo_path: string | null
+          products: string | null
+          rating: number | null
+        }
+        Insert: {
+          area?: string | null
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          is_sample?: boolean | null
+          photo_path?: string | null
+          products?: string | null
+          rating?: number | null
+        }
+        Update: {
+          area?: string | null
+          comment?: string | null
+          created_at?: string | null
+          customer_name?: string | null
+          id?: string | null
+          is_sample?: boolean | null
+          photo_path?: string | null
+          products?: string | null
+          rating?: number | null
         }
         Relationships: []
       }

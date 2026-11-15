@@ -54,6 +54,12 @@ src/lib/laptop-advisor.ts  Claude call (claude-opus-5-5, structured output via z
                          server-side refusal fallback) — server only; returns null if no key / error
 src/app/(store)/laptop-finder/  public form + results; actions.ts saves to laptop_requests
 src/app/admin/(panel)/leads/    laptop finder leads: list, detail, follow-up status/notes
+src/app/admin/(panel)/reviews/  approve / hide / delete customer reviews
+src/app/(store)/review/[orderId]/  customer review form (link sent after delivery; signed photo upload)
+src/app/(store)/{warranty-returns,buying-guide,terms,privacy}/  DRAFT policy pages (PolicyPage layout)
+src/components/store/home/  TrustStrip, ShopBy (budget/need/brand), Reviews, StayInTouch
+src/lib/shop-filters.ts  budget ranges (naira, used in URLs ?min=&max=)
+src/lib/placeholders.ts  detects seeded placeholder business details (admin reminders)
 src/components/admin/ActionButton.tsx  button for a pre-bound Server Action (`action.bind(null, id)`)
 src/components/store/    Header, Footer, ProductCard/Grid, ProductGallery, AddToCart, CartView, WhatsApp
 src/lib/auth.ts          getAdminUser / requireAdmin / adminDb  ← admin data access layer
@@ -109,6 +115,11 @@ supabase/migrations/     SQL migrations, timestamp-prefixed
   from `public_products`; AI product ids are re-validated against the in-stock list. Leads are
   saved even when the AI fails. Limit: 3 requests per phone per 24h + honeypot field.
   Calendly link lives in `settings.calendly_url` (hidden when empty).
+- Reviews: only delivered/completed orders, one per order, `pending` until approved; public reads
+  via `public_reviews` view (approved only, no order link). Never publish invented reviews —
+  `is_sample` rows are labelled "Sample" on the site and flagged in admin.
+- Deals: `products.compare_at_price` ("was" price, must be > selling_price) → amber "-X%" badge.
+- Money inputs: always `<MoneyInput>` (strict format + live preview); pre-fill with `koboToNairaInput`.
 - Order items snapshot name/price/cost at order time. `unit_cost` and `vendor_id`
   are prefilled from the product and adjusted by admin after sourcing.
 - Status changes are logged automatically by a DB trigger into
@@ -137,7 +148,7 @@ Copy: tagline **"Enjoy your work"**. Selling points: **vetted & trusted vendors*
 
 Tokens live in `src/app/globals.css` (`@theme`). **Never hard-code hex values or
 use raw Tailwind palettes (blue/green/red/amber/gray) in components** — use:
-- `brand-50…950` (600 = primary brand colour), `accent` (amber),
+- `brand-50…950` built on the logo blue (500 = #0280F1 logo; 600 = #0270D6 for buttons/links — logo blue fails AA for text), `accent` (amber),
   `success` / `warning` / `danger` (+ `-50` tint, `-700` text), and `slate-*` neutrals.
 
 Colour roles:

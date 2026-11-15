@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getAdminUser } from "@/lib/auth";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { Field } from "@/components/ui/Field";
+import { LogoMark } from "@/components/ui/Logo";
 import { inputCls } from "@/components/ui/styles";
 import { login } from "./actions";
 
@@ -20,7 +21,10 @@ export default async function LoginPage({
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-6 text-xl font-semibold">Admin login</h1>
+        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+          <LogoMark size={56} priority />
+          <h1 className="text-xl font-semibold">Admin login</h1>
+        </div>
         <ActionForm action={login} submitLabel="Log in">
           <input type="hidden" name="next" value={next} />
           <Field label="Email">

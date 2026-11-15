@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImageOff } from "lucide-react";
 import { CONDITIONS } from "@/lib/constants";
-import { formatNaira } from "@/lib/money";
-import type { Product } from "@/lib/products";
+import { Price } from "./Price";
+import { discountPercent, type Product } from "@/lib/products";
 import { Badge } from "@/components/ui/Badge";
 
 export function ProductCard({ product }: { product: Product }) {
@@ -32,13 +32,16 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           <Badge tone="brand">{CONDITIONS[product.condition]}</Badge>
           {soldOut && <Badge tone="danger">Out of stock</Badge>}
+          {discountPercent(product) > 0 && <Badge tone="accent">-{discountPercent(product)}%</Badge>}
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-1 p-3">
         <h3 className="line-clamp-2 text-sm font-medium text-slate-900 group-hover:text-brand-700">
           {product.name}
         </h3>
-        <p className="mt-auto pt-1 text-base font-bold text-slate-900">{formatNaira(product.price)}</p>
+        <div className="mt-auto pt-1">
+          <Price product={product} />
+        </div>
       </div>
     </Link>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/store";
+import { USE_CASES } from "@/lib/laptop-finder";
 import { LaptopFinder } from "./LaptopFinder";
 
 export const metadata: Metadata = {
@@ -8,10 +9,10 @@ export const metadata: Metadata = {
     "Tell us what you need a laptop for and your budget. We'll recommend the right one — new, UK-used or refurbished — and help you get it in Lagos.",
 };
 
-export const revalidate = 300;
-
-export default async function LaptopFinderPage() {
-  const settings = await getSettings();
+// Reads ?use=… (from the home page "Shop by need" tiles) to pre-select the use case.
+export default async function LaptopFinderPage({ searchParams }: { searchParams: Promise<{ use?: string }> }) {
+  const [settings, { use }] = await Promise.all([getSettings(), searchParams]);
+  const initialUseCase = use && use in USE_CASES ? use : "";
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
       <h1 className="text-3xl font-bold">Find the right laptop</h1>
@@ -24,6 +25,7 @@ export default async function LaptopFinderPage() {
           calendlyUrl={settings.calendlyUrl}
           whatsappNumber={settings.whatsappNumber}
           storeName={settings.storeName}
+          initialUseCase={initialUseCase}
         />
       </div>
     </div>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Check, Phone } from "lucide-react";
 import { z } from "zod";
 import { adminDb } from "@/lib/auth";
+import { publicEnv } from "@/lib/env";
 import { ORDER_STATUSES } from "@/lib/constants";
 import { formatLagosDateTime } from "@/lib/dates";
 import { formatNaira } from "@/lib/money";
@@ -64,6 +65,10 @@ export default async function AdminOrderPage({ params }: { params: Promise<{ id:
       status: order.status,
       riderName: order.riders?.name,
       riderPhone: order.riders?.phone,
+      reviewUrl:
+        order.status === "delivered" || order.status === "completed"
+          ? `${publicEnv.siteUrl}/review/${order.id}`
+          : undefined,
     }),
   );
 

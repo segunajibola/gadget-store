@@ -53,6 +53,13 @@ const productSchema = z
     warranty: optionalText,
     selling_price: nairaAmount("Selling price").refine((k) => k > 0, "Selling price must be above ₦0"),
     cost_price: nairaAmount("Vendor cost price"),
+    // Optional "was" price — blank = not on deal.
+    compare_at_price: z
+      .string()
+      .optional()
+      .transform((v) => (v?.trim() ? v : undefined))
+      .pipe(nairaAmount("Was price").optional())
+      .transform((v) => v ?? null),
     vendor_id: optionalText,
     stock_status: stockEnum,
     is_featured: z.boolean(),
@@ -62,6 +69,10 @@ const productSchema = z
   .refine((p) => p.cost_price <= p.selling_price, {
     message: "Vendor cost can't be higher than the selling price.",
     path: ["cost_price"],
+  })
+  .refine((p) => p.compare_at_price === null || p.compare_at_price > p.selling_price, {
+    message: "The “was” price must be higher than the selling price (or leave it blank).",
+    path: ["compare_at_price"],
   })
   // Blank slug → generate from name.
   .transform((p) => ({ ...p, slug: slugify(p.slug || p.name) }))
